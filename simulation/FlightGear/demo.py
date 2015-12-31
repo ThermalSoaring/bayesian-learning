@@ -1,3 +1,7 @@
+#
+# Run FlightGear first: fgfs --telnet=5500
+#
+
 import time
 from FlightGear import FlightGear
 
