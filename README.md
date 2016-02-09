@@ -4,6 +4,7 @@
 Relevant to our project
 
 #### gaussian-thermals
+#### gaussian-process-regression
 #### square-thermals-partial
 #### square-thermals
 
