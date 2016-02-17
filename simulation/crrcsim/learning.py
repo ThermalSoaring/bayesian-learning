@@ -117,8 +117,17 @@ class GroundStation:
             self.battery, self.airspeed, self.alt, self.lat, self.lon,
             self.vz, self.wind_speed, self.wind_speed_z, self.temperature))
 
+    def header(self):
+        return("Roll, Pitch, Yaw, RollSpeed, PitchSpeed, YawSpeed, AirSpeed, GroundSpeed, Heading, Throttle, Alt, Timestamp, Timeboot, PressureAbs, PressureDiff, Temperature, Battery, WindDirection, WindSpeed, WindSpeedZ, Lat, Lon, Vx, Vy, Vz")
+        #return("Roll*100, Pitch*100, Yaw*100, RollSpeed*100, PitchSpeed*1000, YawSpeed*1000, AirSpeed, GroundSpeed, Heading, Throttle, Alt, Timestamp, Timeboot, PressureAbs, PressureDiff, Temperature, Battery, WindDirection, WindSpeed*10, WindSpeedZ, Lat, Lon, Vx, Vy, Vz")
+
+    def __str__(self):
+        return(', '.join([str(i) for i in [self.roll, self.pitch, self.yaw, self.rollspeed, self.pitchspeed, self.yawspeed, self.airspeed, self.groundspeed, self.heading, self.throttle, self.alt, self.timestamp, self.timeboot, self.pressure_abs, self.pressure_diff, self.temperature, self.battery, self.wind_direction, self.wind_speed, self.wind_speed_z, self.lat, self.lon, self.vx, self.vy, self.vz]]))
+        #return(', '.join([str(int(round(i))) for i in [self.roll*100, self.pitch*100, self.yaw*100, self.rollspeed*100, self.pitchspeed*1000, self.yawspeed*1000, self.airspeed, self.groundspeed, self.heading, self.throttle, self.alt, self.timestamp, self.timeboot, self.pressure_abs, self.pressure_diff, self.temperature, self.battery, self.wind_direction, self.wind_speed*10, self.wind_speed_z, self.lat, self.lon, self.vx, self.vy, self.vz]]))
+
 if __name__ == "__main__":
     s = GroundStation('localhost:9999')
+    filename = "simulation.csv"
 
     try:
         # Wait till armed
@@ -131,9 +140,14 @@ if __name__ == "__main__":
 
         # TODO: send waypoints
 
-        while True:
-            print(s)
-            time.sleep(1)
+        with open(filename, "w+") as f:
+            f.write(s.header()+'\n')
+
+        with open(filename, "a+") as f:
+            while True:
+                f.write(str(s)+'\n')
+                print(repr(s))
+                time.sleep(1)
 
     except KeyboardInterrupt:
         print("Exiting...")
