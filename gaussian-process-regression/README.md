@@ -1,0 +1,14 @@
+# Gaussian Process Regression
+
+## GPR Thermal Soaring
+Use Gaussian process regression to see how it learns the thermal field
+and how the uncertainty changes with the number of observations taken at
+random points.
+
+## GPR vs. Bayesian
+Try to visualize a comparison between GPR and the Bayesian parameter
+estimation from the *gaussian-thermals/* directory. Since we can't
+directly visualize a comparison with probability distributions of
+parameters, we'll look at the most probable thermal field from MAP
+estimates of the parameters. Now we use more realistic observation
+points, along a path rather than random points over some area.
