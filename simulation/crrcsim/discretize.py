@@ -1,7 +1,14 @@
+#
+# Usage:
+#
+# $ python3
+# >>> from discretize import discretize
+# >>> discretize('path/to/file.csv', 'path/to/output.csv', 50)
+#
 import csv
 import numpy as np
 
-def discretize(infile, outfile, numbins):
+def discretize(infile, outfile, numbins=50):
     # Read
     with open(infile, newline='') as csvfile:
         reader = csv.reader(csvfile, delimiter=',', quotechar='"')
@@ -19,8 +26,8 @@ def discretize(infile, outfile, numbins):
 
         # Discretize each column
         if len(rows) > 0:
-            assert len(rows[0]) == 25, \
-                    "Not valid data, wrong number of columns"
+            #assert len(rows[0]) == 25, \
+            #        "Not valid data, wrong number of columns"
 
             np_rows = np.array(rows, dtype=np.float)
             output_rows = np.zeros(np_rows.shape, dtype=np.int)
