@@ -14,6 +14,7 @@ Learning about Bayesian techniques
 #### chess-winning
 #### coin-flip
 #### multi-armed-bandit
+#### word-prediction
 
 ## Connecting with simulator
 May be useful in the future on my computer since I don't have Windows
