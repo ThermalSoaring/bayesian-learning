@@ -16,3 +16,7 @@ points, along a path rather than random points over some area.
 ## GPR Varying Parameters
 What happens when we change the GPR parameters? What hyperparameters are we
 using? How does this compare with what Lawrance got in his thesis?
+
+## GPR Simulation Data
+Use data from the simulator rather than data from a simple Gaussian-shaped
+thermal.
