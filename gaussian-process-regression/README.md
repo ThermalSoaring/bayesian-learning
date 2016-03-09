@@ -12,3 +12,7 @@ directly visualize a comparison with probability distributions of
 parameters, we'll look at the most probable thermal field from MAP
 estimates of the parameters. Now we use more realistic observation
 points, along a path rather than random points over some area.
+
+## GPR Varying Parameters
+What happens when we change the GPR parameters? What hyperparameters are we
+using? How does this compare with what Lawrance got in his thesis?
