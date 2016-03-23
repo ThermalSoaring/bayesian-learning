@@ -20,7 +20,6 @@ using? How does this compare with what Lawrance got in his thesis?
 ## GPR Simulation Data - Picking Nugget
 Based on the simulation data, pick a reasonable nugget value for the GPR.
 
-## GPR Simulation Data
+## GPR vs. Bayesian using Simulation Data
 Use data from the simulator rather than data from a simple Gaussian-shaped
 thermal.
-
