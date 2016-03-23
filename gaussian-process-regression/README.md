@@ -17,6 +17,10 @@ points, along a path rather than random points over some area.
 What happens when we change the GPR parameters? What hyperparameters are we
 using? How does this compare with what Lawrance got in his thesis?
 
+## GPR Simulation Data - Picking Nugget
+Based on the simulation data, pick a reasonable nugget value for the GPR.
+
 ## GPR Simulation Data
 Use data from the simulator rather than data from a simple Gaussian-shaped
 thermal.
+
