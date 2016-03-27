@@ -60,7 +60,7 @@ struct AutopilotData
 
     AutopilotData(const std::string& s)
     {
-        json j(s);
+        json j = json::parse(s);
         date = j["date"];
         lat = j["lat"];
         lon = j["lon"];
@@ -119,7 +119,7 @@ struct AutopilotCommand
 
     AutopilotCommand(const std::string& s)
     {
-        json j(s);
+        json j = json::parse(s);
         date = j["date"];
         lat = j["lat"];
         lon = j["lon"];
@@ -183,15 +183,22 @@ class ConnectionManager
     enum { max_recent_data = 100 };
     enum { max_commands = 100 };
     std::set<connection_ptr> connections;
+    std::mutex data_mutex;
     std::deque<AutopilotData> recent_data;
     std::mutex commands_mutex;
     std::deque<AutopilotCommand> commands;
 
 public:
+    ConnectionManager()
+    {
+    }
+
     // Add/remove connections from the list
     void addConnection(connection_ptr con)
     {
         connections.insert(con);
+
+        std::lock_guard<std::mutex> guard(data_mutex);
 
         for (auto d : recent_data)
             con->push(d);
@@ -205,6 +212,8 @@ public:
     // Send new data to all connections
     void push(const AutopilotData& d)
     {
+        std::lock_guard<std::mutex> guard(data_mutex);
+
         // Save new data
         recent_data.push_back(d);
 
@@ -296,24 +305,20 @@ private:
     {
         auto self(shared_from_this());
 
-        // Read from connection until an \r\n
+        // Read from connection until an \0
         //
         // See: http://think-async.com/Asio/asio-1.10.6/doc/asio/overview/core/line_based.html
-        asio::async_read_until(socket, streambuf, "\r\n",
-                [this, &self](std::error_code ec, std::size_t /*length*/)
+        asio::async_read_until(socket, streambuf, '\0',
+                [this, self](std::error_code ec, std::size_t /*length*/)
                 {
                     if (!ec)
                     {
-                        // JSON line
-                        std::string command;
-                        // \r\n at the end
-                        char cr, lf;
                         // Input stream from this ASIO stream buf
                         std::istream is(&streambuf);
-                        // Don't skip whitespace
-                        is.unsetf(std::ios_base::skipws);
-                        // Read from stream buf
-                        is >> command >> cr >> lf;
+
+                        // Get up to the \0
+                        std::string command;
+                        std::getline(is, command, '\0');
 
                         // Do something with the command we read
                         manager.processCommand(command);
@@ -323,6 +328,8 @@ private:
                     }
                     else
                     {
+                        std::cerr << "Error: reading, closing connection" << std::endl;
+
                         // An error occured, so remove this current
                         // connection
                         manager.removeConnection(shared_from_this());
@@ -335,7 +342,7 @@ private:
     void do_write()
     {
         auto self(shared_from_this());
-        std::string data = write_data.front().str() + "\r\n";
+        std::string data = write_data.front().str() + '\0';
         asio::async_write(socket,
                 asio::buffer(data, data.length()),
                 [this, self](std::error_code ec, std::size_t /*length*/)
@@ -353,6 +360,8 @@ private:
                     }
                     else
                     {
+                        std::cerr << "Error: writing, closing connection" << std::endl;
+
                         // An error occured, so remove this current
                         // connection
                         manager.removeConnection(shared_from_this());
@@ -404,15 +413,23 @@ private:
 class AutopilotThread
 {
     std::atomic_bool exit;
-    std::thread t;
     ConnectionManager& manager;
+    std::thread t;
 
 public:
     AutopilotThread(ConnectionManager& manager)
         : exit(false),
+          // Note: manager *must* be initialized before starting the thread
           manager(manager),
           t(&AutopilotThread::run, this)
     {
+    }
+
+    // On destruct, end this
+    ~AutopilotThread()
+    {
+        terminate();
+        join();
     }
 
     // Our thread
@@ -476,10 +493,6 @@ int main(int argc, char* argv[])
 
         // Wait for server tasks to complete
         io_service.run();
-
-        // Tell autopilot thread to exit and wait for it to finish
-        autopilotThread.terminate();
-        autopilotThread.join();
     }
     catch (std::exception& e)
     {
