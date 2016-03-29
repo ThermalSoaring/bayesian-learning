@@ -5,12 +5,10 @@ DEPENDS    = .depends
 
 CXX        = clang++
 
-# ASIO_STANDALONE - No Boost
 # ASIO_ENABLE_HANDLER_TRACKING - Debugging information
-CXXFLAGS  += -g -O2 -Wall -std=c++11 \
-			 -DASIO_STANDALONE
+CXXFLAGS  += -g -O2 -Wall \
 			 #-DASIO_ENABLE_HANDLER_TRACKING
-LDFLAGS   +=  -pthread
+LDFLAGS   += -lboost_system -lboost_thread
 
 all: ${OUT}
 
