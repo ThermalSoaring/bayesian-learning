@@ -26,10 +26,11 @@
 #include <iostream>
 #include <functional>
 #include <asio.hpp>
-#include "json.hpp"
+#include <rapidjson/document.h>
+#include <rapidjson/writer.h>
+#include <rapidjson/stringbuffer.h>
 
 using asio::ip::tcp;
-using json = nlohmann::json;
 
 // Get current date string, for debugging
 std::string now()
@@ -60,11 +61,12 @@ struct AutopilotData
 
     AutopilotData(const std::string& s)
     {
-        json j = json::parse(s);
-        date = j["date"];
-        lat = j["lat"];
-        lon = j["lon"];
-        alt = j["alt"];
+        rapidjson::Document j;
+        j.Parse(s.c_str());
+        date = j["date"].GetString();
+        lat = j["lat"].GetDouble();
+        lon = j["lon"].GetDouble();
+        alt = j["alt"].GetDouble();
     }
 
     AutopilotData(const std::string& date, const double lat, const double lon,
@@ -73,22 +75,27 @@ struct AutopilotData
     {
     }
 
-    // Output as JSON
-    json toJson() const
-    {
-        return {
-            {"type", "data"},
-            {"date", date},
-            {"lat", lat},
-            {"lon", lon},
-            {"alt", alt}
-        };
-    }
-
     // Output JSON string
+    /*{
+        {"type", "data"},
+        {"date", date},
+        {"lat", lat},
+        {"lon", lon},
+        {"alt", alt}
+    }*/
     std::string str() const
     {
-        return toJson().dump();
+        rapidjson::StringBuffer s;
+        rapidjson::Writer<rapidjson::StringBuffer> writer(s);
+        writer.StartObject();
+        writer.Key("type"); writer.String("data");
+        writer.Key("date"); writer.String(date.c_str());
+        writer.Key("lat"); writer.Double(lat);
+        writer.Key("lon"); writer.Double(lon);
+        writer.Key("alt"); writer.Double(alt);
+        writer.EndObject();
+
+        return s.GetString();
     }
 
     // Cast to string by outputting JSON string
@@ -119,12 +126,13 @@ struct AutopilotCommand
 
     AutopilotCommand(const std::string& s)
     {
-        json j = json::parse(s);
-        date = j["date"];
-        lat = j["lat"];
-        lon = j["lon"];
-        alt = j["alt"];
-        radius = j["radius"];
+        rapidjson::Document j;
+        j.Parse(s.c_str());
+        date = j["date"].GetString();
+        lat = j["lat"].GetDouble();
+        lon = j["lon"].GetDouble();
+        alt = j["alt"].GetDouble();
+        radius = j["radius"].GetDouble();
     }
 
     AutopilotCommand(const double lat, const double lon, const double alt,
@@ -133,23 +141,29 @@ struct AutopilotCommand
     {
     }
 
-    // Output as JSON
-    json toJson() const
-    {
-        return {
-            {"type", "command"},
-            {"date", date},
-            {"lat", lat},
-            {"lon", lon},
-            {"alt", alt},
-            {"radius", radius}
-        };
-    }
-
     // Output JSON string
+    /*{
+        {"type", "command"},
+        {"date", date},
+        {"lat", lat},
+        {"lon", lon},
+        {"alt", alt}
+        {"radius", radius}
+    }*/
     std::string str() const
     {
-        return toJson().dump();
+        rapidjson::StringBuffer s;
+        rapidjson::Writer<rapidjson::StringBuffer> writer(s);
+        writer.StartObject();
+        writer.Key("type"); writer.String("command");
+        writer.Key("date"); writer.String(date.c_str());
+        writer.Key("lat"); writer.Double(lat);
+        writer.Key("lon"); writer.Double(lon);
+        writer.Key("alt"); writer.Double(alt);
+        writer.Key("radius"); writer.Double(radius);
+        writer.EndObject();
+
+        return s.GetString();
     }
 
     // Cast to string by outputting JSON string
