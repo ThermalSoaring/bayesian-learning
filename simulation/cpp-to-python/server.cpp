@@ -287,12 +287,14 @@ class Session
 {
     tcp::socket socket;
     ConnectionManager& manager;
+    const char delimiter;
     asio::streambuf streambuf;
     std::deque<AutopilotData> write_data;
 
 public:
-    Session(asio::io_service& io_service, ConnectionManager& manager)
-        : socket(io_service), manager(manager)
+    Session(asio::io_service& io_service, ConnectionManager& manager,
+            char delimiter='\0')
+        : socket(io_service), manager(manager), delimiter(delimiter)
     {
     }
 
@@ -330,10 +332,10 @@ private:
     // Read commands from the clients
     void do_read()
     {
-        // Read from connection until an \0
+        // Read from connection until the delimiter
         //
         // See: http://think-async.com/Asio/asio-1.10.6/doc/asio/overview/core/line_based.html
-        asio::async_read_until(socket, streambuf, '\0',
+        asio::async_read_until(socket, streambuf, delimiter,
                 boost::bind(&Session::handle_read, shared_from_this(),
                     boost::asio::placeholders::error));
     }
@@ -345,9 +347,9 @@ private:
             // Input stream from this ASIO stream buf
             std::istream is(&streambuf);
 
-            // Get up to the \0
+            // Get up to the delimiter
             std::string command;
-            std::getline(is, command, '\0');
+            std::getline(is, command, delimiter);
 
             // Do something with the command we read
             manager.processCommand(command);
@@ -368,9 +370,9 @@ private:
     // Write autopilot data to the connection
     void do_write()
     {
-        std::string data = write_data.front().str() + '\0';
+        std::string data = write_data.front().str() + delimiter;
         asio::async_write(socket,
-                asio::buffer(data, data.length()),
+                asio::buffer(data.c_str(), data.length()),
                 boost::bind(&Session::handle_write, shared_from_this(),
                     boost::asio::placeholders::error));
     }
