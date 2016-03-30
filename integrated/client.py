@@ -6,6 +6,14 @@
 # https://docs.python.org/3/howto/sockets.html
 # http://stackoverflow.com/a/1716173
 
+#
+# TODO use multiprocessing. We'll run into issues if we don't receive data in
+# over 4 seconds since we're only saving so much recent data in the C++
+# program. We need to keep receiving data and saving it here so that whenever
+# we finish running GPR, we can use the last 45 seconds or so of data.
+#
+
+import os
 import sys
 import json
 import copy
@@ -15,6 +23,8 @@ import argparse
 import threading
 from time import sleep
 from collections import deque
+import multiprocessing
+from multiprocessing.managers import BaseManager
 from learning import readNetworkData, shrinkSamples, GPRParams, RunPath
 import matplotlib.pyplot as plt
 
@@ -27,15 +37,72 @@ delimiter = b'\0'
 #plt.show()
 
 #
+# Holds data and commands
+#
+class NetworkData:
+    def __init__(self, maxLength):
+        self.data = deque(maxlen=maxLength)
+        self.commands = deque(maxlen=maxLength)
+
+    # Add data/commands
+    def addData(self, d):
+        self.data.append(d)
+
+    def addCommand(self, c):
+        self.commands.append(c)
+
+    # Get one and pop off that we've used this data
+    def getData(self):
+        if len(self.data) > 0:
+            d = self.data[0]
+            self.data.popleft()
+            return d
+
+        return None
+
+    # Just get *all* the data, so we can just keep on running the thermal
+    # identification on the last so many data points
+    def getAllData(self):
+        if len(self.data) > 0:
+            return copy.deepcopy(self.data)
+
+        return None
+
+    # Get one and pop off that we've sent this command
+    def getCommand(self):
+        if len(self.commands) > 0:
+            d = self.commands[0]
+            self.commands.popleft()
+            return d
+
+        return None
+
+#
+# Make this work between proceses
+#
+class NetworkManager(BaseManager):
+    pass
+
+NetworkManager.register('NetworkData', NetworkData)
+
+#
+# Show process info
+#
+def processInfo(title):
+    if debug:
+        print(title)
+        print('  module name:', __name__)
+        print('  parent process:', os.getppid())
+        print('  process id:', os.getpid())
+        print()
+
+#
 # Processing thread, where we do thermal identification
 #
-def processingThread(manager):
-    while True:
-        #data = manager.getData()
-        #if data:
-        #    print("Received: ", data)
-        #sleep(1/40.0)
+def processingThread(manager, maxLength):
+    processInfo("processingThread")
 
+    while True:
         # Get the last so many data points
         networkData = manager.getAllData()
 
@@ -73,57 +140,13 @@ def processingThread(manager):
     print("Exiting processingThread")
 
 #
-# Manage data and commands
-#
-class NetworkManager:
-    def __init__(self, maxLength=750):
-        self.dataLock = threading.Lock()
-        self.data = deque(maxlen=maxLength)
-        self.commandsLock = threading.Lock()
-        self.commands = deque(maxlen=maxLength)
-
-    # Add data/commands
-    def addData(self, d):
-        with self.dataLock:
-            self.data.append(d)
-
-    def addCommand(self, c):
-        with self.commandsLock:
-            self.commands.append(c)
-
-    # Get one and pop off that we've used this data
-    def getData(self):
-        with self.dataLock:
-            if len(self.data) > 0:
-                d = self.data[0]
-                self.data.popleft()
-                return d
-
-        return None
-
-    # Just get *all* the data, so we can just keep on running the thermal
-    # identification on the last so many data points
-    def getAllData(self):
-        with self.dataLock:
-            if len(self.data) > 0:
-                return copy.deepcopy(self.data)
-
-        return None
-
-    # Get one and pop off that we've sent this command
-    def getCommand(self):
-        with self.commandsLock:
-            if len(self.commands) > 0:
-                d = self.commands[0]
-                self.commands.popleft()
-                return d
-
-        return None
-
-#
 # Thread to get data from the network connection and send commands through it
 #
-def networkingThread(server, port, manager):
+def networkingThread(server, port, manager, maxLength):
+    dataDeque = deque(maxlen=maxLength)
+    commandsDeque = deque(maxlen=maxLength)
+    processInfo("networkingThread")
+
     # Connect to server
     print("Connecting to ", server, ":", port, sep="")
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -171,7 +194,7 @@ def networkingThread(server, port, manager):
                 # before that
                 if len(delimfound) > 0:
                     receivedData = json.loads(before.decode('utf-8'))
-                    manager.addData(receivedData)
+                    dataDeque.append(receivedData)
 
                     if debug:
                         i += 1
@@ -191,9 +214,7 @@ def networkingThread(server, port, manager):
                     #    "radius": 15.0
                     #    })
                     #print("Sending:", command)
-                    #with commandLock:
-                        #command
-                        #sendBuf += command.encode('utf-8') + delimiter
+                    #sendBuf += command.encode('utf-8') + delimiter
 
                 # If we don't have any messages, continue receiving more
                 # data
@@ -244,13 +265,19 @@ if __name__ == "__main__":
     global debug
     debug = args.debug
 
-    # Manage the data and commands from multiple threads
-    nm = NetworkManager()
+    processInfo("mainThread")
 
-    # Start the threads
-    nt = threading.Thread(target=networkingThread,args=[server,port,nm])
-    pt = threading.Thread(target=processingThread,args=[nm])
-    nt.start()
-    pt.start()
-    pt.join()
-    nt.join()
+    # Max length of data to keep
+    maxLength = 750
+
+    # Data to be passed back and forth between processes
+    with NetworkManager() as manager:
+        nd = manager.NetworkData(maxLength)
+
+        # Start the threads
+        n = multiprocessing.Process(target=networkingThread,args=[server, port, nd, maxLength])
+        p = multiprocessing.Process(target=processingThread,args=[nd, maxLength])
+        n.start()
+        p.start()
+        p.join()
+        n.join()
