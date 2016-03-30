@@ -17,6 +17,9 @@ Learning about Bayesian techniques
 #### word-prediction
 
 ## Connecting with simulator
-May be useful in the future on my computer since I don't have Windows
 
 #### simulation
+Connect with FlightGear and crrcsim
+
+##### integrated
+Run GPR and Bayesian parameter estimation connected with the Piccolo simulator
