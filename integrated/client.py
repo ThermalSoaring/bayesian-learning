@@ -5,18 +5,10 @@
 # Based on:
 # https://docs.python.org/3/howto/sockets.html
 # http://stackoverflow.com/a/1716173
-
-#
-# TODO use multiprocessing. We'll run into issues if we don't receive data in
-# over 4 seconds since we're only saving so much recent data in the C++
-# program. We need to keep receiving data and saving it here so that whenever
-# we finish running GPR, we can use the last 45 seconds or so of data.
-#
-
+# http://stackoverflow.com/a/27345949
 import os
 import sys
 import json
-import copy
 import select
 import socket
 import argparse
@@ -24,7 +16,7 @@ import threading
 from time import sleep
 from collections import deque
 import multiprocessing
-from multiprocessing.managers import BaseManager
+from multiprocessing.managers import SyncManager
 from learning import readNetworkData, shrinkSamples, GPRParams, RunPath
 import matplotlib.pyplot as plt
 
@@ -37,12 +29,17 @@ delimiter = b'\0'
 #plt.show()
 
 #
-# Holds data and commands
+# Allow working with a deque between threads
+#
+SyncManager.register('deque', deque)
+
+#
+# Work with data and commands
 #
 class NetworkData:
-    def __init__(self, maxLength):
-        self.data = deque(maxlen=maxLength)
-        self.commands = deque(maxlen=maxLength)
+    def __init__(self, data, commands):
+        self.data = data
+        self.commands = commands
 
     # Add data/commands
     def addData(self, d):
@@ -53,8 +50,11 @@ class NetworkData:
 
     # Get one and pop off that we've used this data
     def getData(self):
-        if len(self.data) > 0:
-            d = self.data[0]
+        # Must copy since AutoProxy[deque] doesn't allow indexing
+        c = self.data.copy()
+
+        if c:
+            d = c[0]
             self.data.popleft()
             return d
 
@@ -63,27 +63,18 @@ class NetworkData:
     # Just get *all* the data, so we can just keep on running the thermal
     # identification on the last so many data points
     def getAllData(self):
-        if len(self.data) > 0:
-            return copy.deepcopy(self.data)
-
-        return None
+        return self.data.copy()
 
     # Get one and pop off that we've sent this command
     def getCommand(self):
-        if len(self.commands) > 0:
-            d = self.commands[0]
+        c = self.commands.copy()
+
+        if c:
+            d = c[0]
             self.commands.popleft()
             return d
 
         return None
-
-#
-# Make this work between proceses
-#
-class NetworkManager(BaseManager):
-    pass
-
-NetworkManager.register('NetworkData', NetworkData)
 
 #
 # Show process info
@@ -143,8 +134,6 @@ def processingThread(manager, maxLength):
 # Thread to get data from the network connection and send commands through it
 #
 def networkingThread(server, port, manager, maxLength):
-    dataDeque = deque(maxlen=maxLength)
-    commandsDeque = deque(maxlen=maxLength)
     processInfo("networkingThread")
 
     # Connect to server
@@ -194,7 +183,7 @@ def networkingThread(server, port, manager, maxLength):
                 # before that
                 if len(delimfound) > 0:
                     receivedData = json.loads(before.decode('utf-8'))
-                    dataDeque.append(receivedData)
+                    manager.addData(receivedData)
 
                     if debug:
                         i += 1
@@ -270,11 +259,15 @@ if __name__ == "__main__":
     # Max length of data to keep
     maxLength = 750
 
-    # Data to be passed back and forth between processes
-    with NetworkManager() as manager:
-        nd = manager.NetworkData(maxLength)
+    with SyncManager() as manager:
+        # Data to be passed back and forth between processes
+        data = manager.deque(maxlen=maxLength)
+        commands = manager.deque(maxlen=maxLength)
 
-        # Start the threads
+        # Functions to operate on these deques
+        nd = NetworkData(data, commands)
+
+        # Start the processes
         n = multiprocessing.Process(target=networkingThread,args=[server, port, nd, maxLength])
         p = multiprocessing.Process(target=processingThread,args=[nd, maxLength])
         n.start()
