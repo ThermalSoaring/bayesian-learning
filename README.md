@@ -1,7 +1,16 @@
 # Bayesian Learning
 
+## Connecting with simulator
+Processing using the live data from a simulator
+
+#### integrated
+Run GPR and Bayesian parameter estimation connected with the Piccolo simulator
+
+#### simulation
+Connect with FlightGear and crrcsim
+
 ## Thermal Examples
-Relevant to our project
+Advancements from simple to complex applied to thermal soaring
 
 #### gaussian-thermals
 #### gaussian-process-regression
@@ -9,17 +18,9 @@ Relevant to our project
 #### square-thermals
 
 ## Basic Examples
-Learning about Bayesian techniques
+Learning about Bayesian techniques, demonstrations of the basic concepts
 
 #### chess-winning
 #### coin-flip
 #### multi-armed-bandit
 #### word-prediction
-
-## Connecting with simulator
-
-#### simulation
-Connect with FlightGear and crrcsim
-
-##### integrated
-Run GPR and Bayesian parameter estimation connected with the Piccolo simulator
