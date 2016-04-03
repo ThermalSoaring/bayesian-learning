@@ -98,15 +98,13 @@ def processingThread(manager, maxLength):
         networkData = manager.getAllData()
 
         # We want quite a few points
-        #
-        # Note: 375 at 25 Hz is 15 seconds, so wait for at least 15 seconds of
-        # data before starting
         if not networkData:
             if debug:
                 print("No data yet")
             sleep(1)
             continue
 
+        # Note: 375 at 25 Hz is 15 seconds
         if len(networkData) < 375:
             if debug:
                 print("Only have", len(networkData))
@@ -118,15 +116,20 @@ def processingThread(manager, maxLength):
         # Take only every n'th point
         data = shrinkSamples(data, 5)
 
-        # Run GPR
-        if debug:
-            print("Running GPR")
-        RunPath(data, gprParams=GPRParams(
-            theta0=1e-2,
-            thetaL=1e-10,
-            thetaU=1e10,
-            nugget=1,
-            random_start=10))
+        if len(data) > 100:
+            # Run GPR
+            if debug:
+                print("Running GPR")
+            RunPath(data, gprParams=GPRParams(
+                theta0=1e-2,
+                thetaL=1e-10,
+                thetaU=1e10,
+                nugget=1,
+                random_start=10))
+        else:
+            if debug:
+                print("Skipping GPR. Only", len(data),
+                    "samples at unique positions")
 
     print("Exiting processingThread")
 
@@ -185,9 +188,9 @@ def networkingThread(server, port, manager, maxLength):
                     receivedData = json.loads(before.decode('utf-8'))
                     manager.addData(receivedData)
 
-                    if debug:
-                        i += 1
-                        print(i, "Received:", receivedData)
+                    #if debug:
+                    #    i += 1
+                    #    print(i, "Received:", receivedData)
 
                     # Save what we haven't processed already
                     recvBuf = after

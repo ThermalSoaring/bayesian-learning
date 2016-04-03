@@ -588,32 +588,27 @@ def readData(df, startAtZero=False, normalize=False):
 # Read data from a deque of objects from the network
 #
 def readNetworkData(networkData):
-    # Turn data into DataFrame
-    origData = pd.DataFrame()
-
-    for i, r in enumerate(networkData):
-        origData = origData.append(pd.DataFrame([[r["date"],r["time"],r["lat"],r["lon"],r["alt"],
-            r["velDown"],r["IAS"],r["TAS"],r["RPS"],r["accelZ"],r["energy"],r["avgEnergy"]]],
-            index=[i], columns=['Date', 'Time', 'Latitude', 'Longitude', 'Altitude',
-                'VelDown', 'Indicated Airspeed', 'True Airspeed', 'Motor Revolutions/s',
-                'AccelZ', 'Energy', 'AvgEnergy']))
+    if not networkData:
+        return None
 
     # Format so so we can run GPR on it
     data = pd.DataFrame()
 
-    # Average all the latitudes to use as the center of our map
-    lat_0 = np.average(origData[['Latitude']])
+    # Just take the first lattitude as the center of our map
+    lat_0 = networkData[0]["lat"]
 
     # Get the data we care about and convert Lat-Long to X-Y
-    #for index, row in df[['Latitude','Longitude','VelDown']].iterrows():
-    for index, row in origData.iterrows():
-        lat = row['Latitude']
-        long = row['Longitude']
-        vel = row['VelDown']
+    for index, row in enumerate(networkData):
+        lat = row['lat']
+        long = row['lon']
+        vel = row['velDown']
         x, y = latLongToXY(lat, long, lat_0)
         data = data.append(pd.DataFrame([[x, y, vel, lat, long]], index=[index],
                                         columns=['x','y','VelDown',
                                                  'Latitude', 'Longitude']))
+
+    # For GPR (x,y) must be unique
+    data = data.drop_duplicates(subset=['x','y'])
 
     return data
 
