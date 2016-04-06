@@ -36,10 +36,8 @@ np.random.seed(123)
 # Show the plot, wait for key press
 #
 def showPlot():
-    #plt.ion()
     plt.draw()
-    plt.waitforbuttonpress(timeout=-1)
-    #plt.ioff()
+    plt.waitforbuttonpress(timeout=0.05)
 
 # Vertical velocity as function of the thermal's position and width
 def deterministicVelocity(path, measurements,
@@ -384,8 +382,8 @@ def GaussianProcessRegression(fig, path, measurements,
     # Generate all the points we want to output at
     # See: http://stackoverflow.com/a/32208788
     grid_x, grid_y = np.meshgrid(
-        np.arange(pos_min_x, pos_max_x, (pos_max_x-pos_min_x)/100),
-        np.arange(pos_min_y, pos_max_y, (pos_max_y-pos_min_y)/100))
+        np.arange(pos_min_x, pos_max_x, (pos_max_x-pos_min_x)/50),
+        np.arange(pos_min_y, pos_max_y, (pos_max_y-pos_min_y)/50))
     grid = np.vstack((grid_x.flatten(), grid_y.flatten())).T
 
     if field:
@@ -476,7 +474,16 @@ def GaussianProcessRegression(fig, path, measurements,
                    c='r', marker='.', s=20, label='Observed')
 
     #return (evalMSE(pred_surface, Z), gp.reduced_likelihood_function(), gp.theta_)
-    return (gp.reduced_likelihood_function(), gp.theta_)
+    #return (gp.reduced_likelihood_function(), gp.theta_)
+
+    # Find the highest point in the grid
+    index = np.argmax(prediction)
+    print("Highest:", grid[index], prediction[index])
+    ax.scatter([grid[index][0]], [grid[index][1]], [prediction[index]],
+            c='b', marker='.', s=2000, label='Max')
+
+    # Return the (lat,lon) of the highest point
+    return grid[index]
 
 #
 # Take a list of points and add the specified number of points
@@ -520,7 +527,7 @@ def RunPath(data, fig=None, gprParams=None):
     path = getPathData(data)
     gpr = GaussianProcessRegression(fig, path, measurements, gprParams=gprParams)
     #BayesianLearning(fig, path, measurements, subplot=122)
-    showPlot()
+    #showPlot()
 
     #print("GPR Parameters:", gprParams)
     #print("GPR Params:")
@@ -528,6 +535,8 @@ def RunPath(data, fig=None, gprParams=None):
     #print("GPR theta value (theta of scikit-learn and DACE, l of R&W and Lawrance):")
     #print("  ", gpr[1], 1.0/np.sqrt(2*gpr[1]))
     #return gpr
+
+    return gpr
 
 #
 # Convert from lat-long to x-y
@@ -601,7 +610,8 @@ def readNetworkData(networkData):
     for index, row in enumerate(networkData):
         lat = row['lat']
         long = row['lon']
-        vel = row['velDown']
+        #vel = row['velDown']
+        vel = row['energy']
         x, y = latLongToXY(lat, long, lat_0)
         data = data.append(pd.DataFrame([[x, y, vel, lat, long]], index=[index],
                                         columns=['x','y','VelDown',
