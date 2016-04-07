@@ -28,9 +28,6 @@ from gpr import GPRParams, ThermalGPR, ThermalGPRPlot
 # From: http://stackoverflow.com/a/35773311
 from IPython.core.debugger import Tracer
 
-# How we separate one set of data from the next
-delimiter = b'\0'
-
 #
 # Allow working with a deque between threads
 #
@@ -99,18 +96,30 @@ class NetworkData:
 #
 def processInfo(title):
     return # Not needed at the moment...
-    if debug:
-        print(title)
-        print('  module name:', __name__)
-        print('  parent process:', os.getppid())
-        print('  process id:', os.getpid())
-        print()
+    print(title)
+    print('  module name:', __name__)
+    print('  parent process:', os.getppid())
+    print('  process id:', os.getpid())
+    print()
 
 #
 # Processing thread, where we do thermal identification
 #
-def processingProcess(manager, fig):
+def processingProcess(manager, debug):
     processInfo("processingProcess")
+
+    # Only show one figure, just update it on key press
+    #
+    # Note: to get the plot to update correctly on Linux, you may have to
+    # change the matplotlib backend. I'm using TkAgg. However, on Windows, the
+    # default one provided with Anaconda works fine apparently.
+    #
+    # .config/matplotlib/matplotlibrc:
+    #   backend      : TkAgg
+    #
+    # http://matplotlib.org/users/customizing.html#customizing-matplotlib
+    #
+    fig = plt.figure(figsize=(10,5))
 
     while True:
         # Get the last so many data points
@@ -152,6 +161,7 @@ def processingProcess(manager, fig):
                         measurements, gprParams)
 
                 # Update the plot
+                plt.ion()
                 plt.draw()
                 plt.waitforbuttonpress(timeout=0.001)
             else:
@@ -192,10 +202,11 @@ def processingProcess(manager, fig):
 # Thread to send commands through network connection
 #
 class NetworkingThreadSend(threading.Thread):
-    def __init__(self, socket, manager):
+    def __init__(self, socket, manager, delimiter):
         threading.Thread.__init__(self)
         self.socket = socket
         self.manager = manager
+        self.delimiter = delimiter
 
         # Store the output data since we will be sending it through multiple
         # send() calls
@@ -210,7 +221,7 @@ class NetworkingThreadSend(threading.Thread):
             c = self.manager.getCommandWait()
 
             # Add it to the buffer
-            self.sendBuf += c.encode('utf-8') + delimiter
+            self.sendBuf += c.encode('utf-8') + self.delimiter
 
             # Send this command
             while self.sendBuf and not self.exiting:
@@ -238,10 +249,12 @@ class NetworkingThreadSend(threading.Thread):
 # Thread to get data from the network connection
 #
 class NetworkingThreadReceive(threading.Thread):
-    def __init__(self, socket, manager):
+    def __init__(self, socket, manager, debug, delimiter):
         threading.Thread.__init__(self)
+        self.debug = debug
         self.socket = socket
         self.manager = manager
+        self.delimiter = delimiter
 
         # Store the input data since we will be receiving it through multiple
         # recv() calls
@@ -276,7 +289,8 @@ class NetworkingThreadReceive(threading.Thread):
                 # Process received messages
                 while True:
                     # Split into (before,delim,after)
-                    before, delimfound, after = self.recvBuf.partition(delimiter)
+                    before, delimfound, after = \
+                        self.recvBuf.partition(self.delimiter)
 
                     # If we found a delimiter, we have a complete message
                     # before that
@@ -285,7 +299,7 @@ class NetworkingThreadReceive(threading.Thread):
                         self.manager.addData(receivedData)
 
                         i += 1
-                        if debug and i%125 == 0:
+                        if self.debug and i%125 == 0:
                             print(i, "Received:", receivedData)
 
                         # Save what we haven't processed already
@@ -303,7 +317,7 @@ class NetworkingThreadReceive(threading.Thread):
 # The process that connects over the network and starts the send and receive
 # threads
 #
-def networkingProcess(server, port, manager):
+def networkingProcess(server, port, manager, debug):
     processInfo("networkingProcess")
 
     # Connect to server
@@ -315,9 +329,12 @@ def networkingProcess(server, port, manager):
     # they're in separate threads
     client.setblocking(1)
 
+    # We'll speparate the data using a null byte
+    delimiter = b'\0'
+
     # Start send/recieve threads
-    receive = NetworkingThreadReceive(client, manager)
-    send = NetworkingThreadSend(client, manager)
+    receive = NetworkingThreadReceive(client, manager, debug, delimiter)
+    send = NetworkingThreadSend(client, manager, delimiter)
     receive.start()
     send.start()
     receive.join()
@@ -342,28 +359,10 @@ if __name__ == "__main__":
         print("Error: invalid server address, example: localhost:2050")
         sys.exit(1)
 
-    # Make the debug flag global
-    global debug
-    debug = args.debug
-
     processInfo("mainProcess")
 
     # Max length of data to keep
     maxLength = 750
-
-    # Only show one figure, just update it on key press
-    #
-    # Note: to get the plot to update correctly, you may have to change the
-    # matplotlib backend. I'm using TkAgg.
-    #
-    # .config/matplotlib/matplotlibrc:
-    #   backend      : TkAgg
-    #
-    # http://matplotlib.org/users/customizing.html#customizing-matplotlib
-    #
-    if debug:
-        plt.ion()
-    fig = plt.figure(figsize=(10,5))
 
     with SyncManager() as manager:
         # Data to be passed back and forth between processes
@@ -381,8 +380,10 @@ if __name__ == "__main__":
         nd = NetworkData(data, commands, commandCondition)
 
         # Start the processes
-        n = multiprocessing.Process(target=networkingProcess,args=[server, port, nd])
-        p = multiprocessing.Process(target=processingProcess,args=[nd, fig])
+        n = multiprocessing.Process(target=networkingProcess,
+                args=[server, port, nd, args.debug])
+        p = multiprocessing.Process(target=processingProcess,
+                args=[nd, args.debug])
         n.start()
         p.start()
         p.join()
