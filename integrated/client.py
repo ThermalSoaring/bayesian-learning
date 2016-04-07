@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 #
 # The Python side of the C++/Python interface
 #
@@ -19,8 +18,15 @@ from datetime import datetime
 from collections import deque
 import multiprocessing
 from multiprocessing.managers import SyncManager
-from learning import readNetworkData, shrinkSamples, GPRParams, RunPath, showPlot
 import matplotlib.pyplot as plt
+
+from data import xyToLatLong, readNetworkData, shrinkSamples
+from gpr import GPRParams, ThermalGPR, ThermalGPRPlot
+
+# For debugging
+# Trigger with: Tracer()()
+# From: http://stackoverflow.com/a/35773311
+from IPython.core.debugger import Tracer
 
 # How we separate one set of data from the next
 delimiter = b'\0'
@@ -133,14 +139,27 @@ def processingProcess(manager, fig):
             # Run GPR
             if debug:
                 print("Running GPR")
-            lat, lon = RunPath(data, lat_0, fig=fig, gprParams=GPRParams(
-                theta0=1e-2,
-                thetaL=1e-10,
-                thetaU=1e10,
-                nugget=1,
-                random_start=10))
+
+            # Data to run GPR
+            path = np.array(data[['x', 'y']])
+            measurements = np.array(data[['energy']])
+            gprParams = GPRParams(theta0=1e-2, thetaL=1e-10, thetaU=1e10,
+                    nugget=1, random_start=10)
+
+            # Run GPR
             if debug:
-                showPlot()
+                x, y, prediction, uncertainty = ThermalGPRPlot(fig, path,
+                        measurements, gprParams)
+
+                # Update the plot
+                plt.draw()
+                plt.waitforbuttonpress(timeout=0.001)
+            else:
+                x, y, prediction, uncertainty = ThermalGPR(path, measurements,
+                        gprParams)
+
+            # Convert X/Y to Lat/Long
+            lat, lon = xyToLatLong(x, y, lat_0)
 
             # Calculate average altitude from last 45 seconds
             s = 0
@@ -155,7 +174,9 @@ def processingProcess(manager, fig):
                 "lat": lat,
                 "lon": lon,
                 "alt": avgAlt,
-                "radius": 15.0
+                "radius": 15.0,
+                "prediction": float(prediction),
+                "uncertainty": float(uncertainty)
                 })
             if debug:
                 print("Sending:", command)
@@ -264,7 +285,7 @@ class NetworkingThreadReceive(threading.Thread):
                         self.manager.addData(receivedData)
 
                         i += 1
-                        if debug and i%25 == 0:
+                        if debug and i%125 == 0:
                             print(i, "Received:", receivedData)
 
                         # Save what we haven't processed already
