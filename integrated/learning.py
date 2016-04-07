@@ -368,7 +368,7 @@ def boundsFromPath(path):
 #
 # Gaussian Process Regression to learn thermals
 #
-def GaussianProcessRegression(fig, path, measurements,
+def GaussianProcessRegression(fig, path, measurements, lat_0,
                               field=None, gprParams=None):
     X = path
     y = measurements
@@ -483,7 +483,7 @@ def GaussianProcessRegression(fig, path, measurements,
             c='b', marker='.', s=2000, label='Max')
 
     # Return the (lat,lon) of the highest point
-    return grid[index]
+    return xyToLatLong(grid[index][0], grid[index][1], lat_0)
 
 #
 # Take a list of points and add the specified number of points
@@ -520,12 +520,12 @@ def morePoints(path, num):
 #
 # Run both techniques on one path
 #
-def RunPath(data, fig=None, gprParams=None):
+def RunPath(data, lat_0, fig=None, gprParams=None):
     if not fig:
         fig = plt.figure(figsize=(15,8))
     measurements = takeMeasurementsData(data)
     path = getPathData(data)
-    gpr = GaussianProcessRegression(fig, path, measurements, gprParams=gprParams)
+    gpr = GaussianProcessRegression(fig, path, measurements, lat_0, gprParams=gprParams)
     #BayesianLearning(fig, path, measurements, subplot=122)
     #showPlot()
 
@@ -551,6 +551,16 @@ def latLongToXY(lat, long, lat_0):
     y = r*lat
 
     return x, y
+
+#
+# Convert from x-y to lat-long
+#
+def xyToLatLong(x, y, lat_0):
+    r = 6.371e6 # m
+    lat = y/r
+    long = x/r/np.cos(lat_0)
+
+    return lat, long
 
 #
 # Read the data from the simulator
@@ -591,7 +601,7 @@ def readData(df, startAtZero=False, normalize=False):
     # For GPR (x,y) must be unique
     data = data.drop_duplicates(subset=['x','y'])
 
-    return data
+    return data, lat_0
 
 #
 # Read data from a deque of objects from the network
@@ -620,7 +630,7 @@ def readNetworkData(networkData):
     # For GPR (x,y) must be unique
     data = data.drop_duplicates(subset=['x','y'])
 
-    return data
+    return data, lat_0
 
 
 #
@@ -692,13 +702,13 @@ def batchProcessing(df, slidingWindow=30, slideBy=15,
         print()
 
         # Compute Lat-Long to X-Y for this sliding window
-        data = readData(df_subset, startAtZero=True)
+        data, lat_0 = readData(df_subset, startAtZero=True)
 
         # Look at the flight path in this window
         #compareXYLatLong(data, latlong=False)
 
         # Run GPR
-        RunPath(data, GPRParams(
+        RunPath(data, lat_0, GPRParams(
             theta0=1e-2,
             thetaL=1e-10,
             thetaU=1e10,

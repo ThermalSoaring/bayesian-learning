@@ -124,7 +124,7 @@ def processingProcess(manager, fig):
             sleep(1)
             continue
 
-        data = readNetworkData(networkData)
+        data, lat_0 = readNetworkData(networkData)
 
         # Take only every n'th point
         data = shrinkSamples(data, 5)
@@ -133,7 +133,7 @@ def processingProcess(manager, fig):
             # Run GPR
             if debug:
                 print("Running GPR")
-            lat, lon = RunPath(data, fig=fig, gprParams=GPRParams(
+            lat, lon = RunPath(data, lat_0, fig=fig, gprParams=GPRParams(
                 theta0=1e-2,
                 thetaL=1e-10,
                 thetaU=1e10,
@@ -263,9 +263,9 @@ class NetworkingThreadReceive(threading.Thread):
                         receivedData = json.loads(before.decode('utf-8'))
                         self.manager.addData(receivedData)
 
-                        #if debug:
-                        #    i += 1
-                        #    print(i, "Received:", receivedData)
+                        i += 1
+                        if debug and i%25 == 0:
+                            print(i, "Received:", receivedData)
 
                         # Save what we haven't processed already
                         self.recvBuf = after
