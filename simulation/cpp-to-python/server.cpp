@@ -290,6 +290,7 @@ class Session
     const char delimiter;
     asio::streambuf streambuf;
     std::deque<AutopilotData> write_data;
+    boost::mutex write_data_mutex;
 
 public:
     Session(asio::io_service& io_service, ConnectionManager& manager,
@@ -316,16 +317,22 @@ public:
     // Add the data to the queue to send and start sending
     void push(const AutopilotData& d)
     {
-        // If the queue is empty, we're not processing the data
-        bool write_in_progress = !write_data.empty();
+		bool write_in_progress = false;
 
-        // Add the new data to the queue
-        write_data.push_back(d);
+		{
+			boost::lock_guard<boost::mutex> guard(write_data_mutex);
 
-        // If we weren't already processing the written data, start doing that
-        // with this new data we've added
-        if (!write_in_progress)
-            do_write();
+			// If the queue is empty, we're not processing the data
+			write_in_progress = !write_data.empty();
+
+			// Add the new data to the queue
+			write_data.push_back(d);
+		}
+
+		// If we weren't already processing the written data, start doing that
+		// with this new data we've added
+		if (!write_in_progress)
+			do_write();
     }
 
 private:
@@ -370,34 +377,50 @@ private:
     // Write autopilot data to the connection
     void do_write()
     {
-        std::string data = write_data.front().str() + delimiter;
-        asio::async_write(socket,
-                asio::buffer(data.c_str(), data.length()),
-                boost::bind(&Session::handle_write, shared_from_this(),
-                    boost::asio::placeholders::error));
+		std::string data;
+
+		{
+			boost::lock_guard<boost::mutex> guard(write_data_mutex);
+			data = write_data.front().str() + delimiter;
+		}
+
+		asio::async_write(socket,
+				asio::buffer(data.c_str(), data.length()),
+				boost::bind(&Session::handle_write, shared_from_this(),
+					boost::asio::placeholders::error));
     }
 
     void handle_write(const boost::system::error_code& ec)
     {
-        if (!ec)
-        {
-            // Remove from the queue since now we've written
-            // this data
-            write_data.pop_front();
+		if (!ec)
+		{
+            bool empty = false;
 
-            // If the queue isn't empty, then write the next
-            // data as well
-            if (!write_data.empty())
+            {
+                boost::lock_guard<boost::mutex> guard(write_data_mutex);
+
+                // Remove from the queue since now we're writing this data
+                //
+                // Do this after we write since if we do it before and we add
+                // more data right at that moment, then we'd start another
+                // write since the queue was empty, even though we're already
+                // writing, if we do this in more than one thread
+                write_data.pop_front();
+
+                empty = write_data.empty();
+            }
+
+            // If the queue isn't empty, then write the next data as well
+            if (!empty)
                 do_write();
-        }
-        else
-        {
+		}
+		else
+		{
             std::cerr << "Note: could not write, closing connection" << std::endl;
 
-            // An error occured, so remove this current
-            // connection
+            // An error occured, so remove this current connection
             manager.removeConnection(shared_from_this());
-        }
+		}
     }
 };
 
@@ -456,9 +479,10 @@ public:
     AutopilotThread(ConnectionManager& manager)
         : exit(false),
           // Note: manager *must* be initialized before starting the thread
-          manager(manager),
-          t(&AutopilotThread::run, this)
+          manager(manager)
     {
+        // Start thread after initiallizing everything
+        t = boost::thread(&AutopilotThread::run, this);
     }
 
     // On destruct, end this
