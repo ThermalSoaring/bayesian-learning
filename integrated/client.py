@@ -155,42 +155,46 @@ def processingProcess(manager, debug):
             gprParams = GPRParams(theta0=1e-2, thetaL=1e-10, thetaU=1e10,
                     nugget=1, random_start=10)
 
-            # Run GPR
-            if debug:
-                x, y, prediction, uncertainty = ThermalGPRPlot(fig, path,
-                        measurements, gprParams)
+            try:
+                # Run GPR
+                if debug:
+                    x, y, prediction, uncertainty = ThermalGPRPlot(fig, path,
+                            measurements, gprParams)
 
-                # Update the plot
-                plt.ion()
-                plt.draw()
-                plt.waitforbuttonpress(timeout=0.001)
-            else:
-                x, y, prediction, uncertainty = ThermalGPR(path, measurements,
-                        gprParams)
+                    # Update the plot
+                    plt.ion()
+                    plt.draw()
+                    plt.waitforbuttonpress(timeout=0.001)
+                else:
+                    x, y, prediction, uncertainty = ThermalGPR(path, measurements,
+                            gprParams)
 
-            # Convert X/Y to Lat/Long
-            lat, lon = xyToLatLong(x, y, lat_0)
+                # Convert X/Y to Lat/Long
+                lat, lon = xyToLatLong(x, y, lat_0)
 
-            # Calculate average altitude from last 45 seconds
-            s = 0
-            for d in networkData:
-                s += d["alt"]
-            avgAlt = s / len(networkData)
+                # Calculate average altitude from last 45 seconds
+                s = 0
+                for d in networkData:
+                    s += d["alt"]
+                avgAlt = s / len(networkData)
 
-            # Send a new orbit and radius
-            command = json.dumps({
-                "type": "command",
-                "date": str(datetime.now()),
-                "lat": lat,
-                "lon": lon,
-                "alt": avgAlt,
-                "radius": 15.0,
-                "prediction": float(prediction),
-                "uncertainty": float(uncertainty)
-                })
-            if debug:
-                print("Sending:", command)
-            manager.addCommand(command)
+                # Send a new orbit and radius
+                command = json.dumps({
+                    "type": "command",
+                    "date": str(datetime.now()),
+                    "lat": lat,
+                    "lon": lon,
+                    "alt": avgAlt,
+                    "radius": 20.0, # Can only be in 10 m intervals
+                    "prediction": float(prediction),
+                    "uncertainty": float(uncertainty)
+                    })
+                if debug:
+                    print("Sending:", command)
+                manager.addCommand(command)
+
+            except ValueError:
+                print("Error: ValueError, couldn't run GPR")
         else:
             if debug:
                 print("Skipping GPR. Only", len(data),
