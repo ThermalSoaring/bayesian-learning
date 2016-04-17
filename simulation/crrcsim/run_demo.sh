@@ -12,8 +12,20 @@
 #
 #   mavlink
 #        $ git clone https://github.com/mavlink/mavlink
-#        $ cd mavlink/pymavlink
-#        $ python2 setup.py build install --user
+#
+#        Fix issue where it won't import mavexpression:
+#        $ sed -i 's/select, mavexpression/select, pymavlink.mavexpression/' \
+#              mavlink/pymavlink/mavutil.py
+#
+#        Add this mavlink/ directory to PYTHONPATH (see export statement below)
+#        So that 'import pymavlink' will work, which is included in this mavlink/
+#        directory.
+#
+#   Optional, recreate the mavlink.py file included in this repository:
+#        $ python3 -m pymavlink.tools.mavgen -o mavlink --lang Python \
+#              --wire-protocol 1.0 ./message_definitions/v1.0/ardupilotmega.xml
+#        $ sed -i 's/from ...generator.mavcrc/from pymavlink.generator.mavcrc/' mavlink.py
+#        $ cp mavlink.py path/to/repo/
 #
 #   mavproxy
 #        $ sudo pacman -S wxpython opencv
@@ -30,8 +42,14 @@
 #        https://github.com/floft/PKGBUILDs/tree/master/crrcsim-apm
 #
 
-# Configuration
+# Path to find APM's sim_vehicle.sh script
 APM="$HOME/Documents/Github/ThermalSoaring/ardupilot"
+
+# Path so we can import pymavlink for communication
+MAVLINK="$HOME/Documents/Github/ThermalSoaring/mavlink"
+export PYTHONPATH="$PYTHONPATH:$MAVLINK"
+
+# Configuration
 ProxyPort=9999
 Script=learning.py
 
@@ -70,7 +88,7 @@ run_autopilot () {
 # Run our code which connects to the MAVProxy ground station started by the
 # autopilot script
 run_ourcode() {
-    xterm -e "python2 \"$Script\"" &
+    xterm -e "python3 \"$Script\"" &
     killList+=("$!")
 }
 

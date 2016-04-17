@@ -8,10 +8,10 @@ Note: this file has been auto-generated. DO NOT EDIT
 
 import struct, array, time, json, os, sys, platform
 
-from mavcrc import x25crc
+from pymavlink.generator.mavcrc import x25crc
 
 WIRE_PROTOCOL_VERSION = "1.0"
-DIALECT = "output"
+DIALECT = "mavlink"
 
 native_supported = platform.system() != 'Windows' # Not yet supported on other dialects
 native_force = 'MAVNATIVE_FORCE' in os.environ # Will force use of native code regardless of what client app wants
@@ -188,7 +188,7 @@ enums['MAV_CMD'][18] = EnumEntry('MAV_CMD_NAV_LOITER_TURNS', '''Loiter around th
 enums['MAV_CMD'][18].param[1] = '''Turns'''
 enums['MAV_CMD'][18].param[2] = '''Empty'''
 enums['MAV_CMD'][18].param[3] = '''Radius around MISSION, in meters. If positive loiter clockwise, else counter-clockwise'''
-enums['MAV_CMD'][18].param[4] = '''Desired yaw angle.'''
+enums['MAV_CMD'][18].param[4] = '''Forward moving aircraft this sets exit xtrack location: 0 for center of loiter wp, 1 for exit location. Else, this is desired yaw angle'''
 enums['MAV_CMD'][18].param[5] = '''Latitude'''
 enums['MAV_CMD'][18].param[6] = '''Longitude'''
 enums['MAV_CMD'][18].param[7] = '''Altitude'''
@@ -197,7 +197,7 @@ enums['MAV_CMD'][19] = EnumEntry('MAV_CMD_NAV_LOITER_TIME', '''Loiter around thi
 enums['MAV_CMD'][19].param[1] = '''Seconds (decimal)'''
 enums['MAV_CMD'][19].param[2] = '''Empty'''
 enums['MAV_CMD'][19].param[3] = '''Radius around MISSION, in meters. If positive loiter clockwise, else counter-clockwise'''
-enums['MAV_CMD'][19].param[4] = '''Desired yaw angle.'''
+enums['MAV_CMD'][19].param[4] = '''Forward moving aircraft this sets exit xtrack location: 0 for center of loiter wp, 1 for exit location. Else, this is desired yaw angle'''
 enums['MAV_CMD'][19].param[5] = '''Latitude'''
 enums['MAV_CMD'][19].param[6] = '''Longitude'''
 enums['MAV_CMD'][19].param[7] = '''Altitude'''
@@ -281,10 +281,28 @@ enums['MAV_CMD'][31] = EnumEntry('MAV_CMD_NAV_LOITER_TO_ALT', '''Begin loiter at
 enums['MAV_CMD'][31].param[1] = '''Heading Required (0 = False)'''
 enums['MAV_CMD'][31].param[2] = '''Radius in meters. If positive loiter clockwise, negative counter-clockwise, 0 means no change to standard loiter.'''
 enums['MAV_CMD'][31].param[3] = '''Empty'''
-enums['MAV_CMD'][31].param[4] = '''Empty'''
+enums['MAV_CMD'][31].param[4] = '''Forward moving aircraft this sets exit xtrack location: 0 for center of loiter wp, 1 for exit location'''
 enums['MAV_CMD'][31].param[5] = '''Latitude'''
 enums['MAV_CMD'][31].param[6] = '''Longitude'''
 enums['MAV_CMD'][31].param[7] = '''Altitude'''
+MAV_CMD_DO_FOLLOW = 32 # Being following a target
+enums['MAV_CMD'][32] = EnumEntry('MAV_CMD_DO_FOLLOW', '''Being following a target''')
+enums['MAV_CMD'][32].param[1] = '''System ID (the system ID of the FOLLOW_TARGET beacon). Send 0 to disable follow-me and return to the default position hold mode'''
+enums['MAV_CMD'][32].param[2] = '''RESERVED'''
+enums['MAV_CMD'][32].param[3] = '''RESERVED'''
+enums['MAV_CMD'][32].param[4] = '''altitude flag: 0: Keep current altitude, 1: keep altitude difference to target, 2: go to a fixed altitude above home'''
+enums['MAV_CMD'][32].param[5] = '''altitude'''
+enums['MAV_CMD'][32].param[6] = '''RESERVED'''
+enums['MAV_CMD'][32].param[7] = '''TTL in seconds in which the MAV should go to the default position hold mode after a message rx timeout'''
+MAV_CMD_DO_FOLLOW_REPOSITION = 33 # Reposition the MAV after a follow target command has been sent
+enums['MAV_CMD'][33] = EnumEntry('MAV_CMD_DO_FOLLOW_REPOSITION', '''Reposition the MAV after a follow target command has been sent''')
+enums['MAV_CMD'][33].param[1] = '''Camera q1 (where 0 is on the ray from the camera to the tracking device)'''
+enums['MAV_CMD'][33].param[2] = '''Camera q2'''
+enums['MAV_CMD'][33].param[3] = '''Camera q3'''
+enums['MAV_CMD'][33].param[4] = '''Camera q4'''
+enums['MAV_CMD'][33].param[5] = '''altitude offset from target (m)'''
+enums['MAV_CMD'][33].param[6] = '''X offset from target (m)'''
+enums['MAV_CMD'][33].param[7] = '''Y offset from target (m)'''
 MAV_CMD_NAV_ROI = 80 # Sets the region of interest (ROI) for a sensor set or the vehicle
                         # itself. This can then be used by the
                         # vehicles control system to control the
@@ -332,6 +350,24 @@ enums['MAV_CMD'][83].param[4] = '''Empty'''
 enums['MAV_CMD'][83].param[5] = '''Empty'''
 enums['MAV_CMD'][83].param[6] = '''Empty'''
 enums['MAV_CMD'][83].param[7] = '''Empty'''
+MAV_CMD_NAV_VTOL_TAKEOFF = 84 # Takeoff from ground using VTOL mode
+enums['MAV_CMD'][84] = EnumEntry('MAV_CMD_NAV_VTOL_TAKEOFF', '''Takeoff from ground using VTOL mode''')
+enums['MAV_CMD'][84].param[1] = '''Empty'''
+enums['MAV_CMD'][84].param[2] = '''Empty'''
+enums['MAV_CMD'][84].param[3] = '''Empty'''
+enums['MAV_CMD'][84].param[4] = '''Yaw angle in degrees'''
+enums['MAV_CMD'][84].param[5] = '''Latitude'''
+enums['MAV_CMD'][84].param[6] = '''Longitude'''
+enums['MAV_CMD'][84].param[7] = '''Altitude'''
+MAV_CMD_NAV_VTOL_LAND = 85 # Land using VTOL mode
+enums['MAV_CMD'][85] = EnumEntry('MAV_CMD_NAV_VTOL_LAND', '''Land using VTOL mode''')
+enums['MAV_CMD'][85].param[1] = '''Empty'''
+enums['MAV_CMD'][85].param[2] = '''Empty'''
+enums['MAV_CMD'][85].param[3] = '''Empty'''
+enums['MAV_CMD'][85].param[4] = '''Yaw angle in degrees'''
+enums['MAV_CMD'][85].param[5] = '''Latitude'''
+enums['MAV_CMD'][85].param[6] = '''Longitude'''
+enums['MAV_CMD'][85].param[7] = '''Altitude'''
 MAV_CMD_NAV_GUIDED_ENABLE = 92 # hand control over to an external controller
 enums['MAV_CMD'][92] = EnumEntry('MAV_CMD_NAV_GUIDED_ENABLE', '''hand control over to an external controller''')
 enums['MAV_CMD'][92].param[1] = '''On / Off (> 0.5f on)'''
@@ -532,6 +568,25 @@ enums['MAV_CMD'][191].param[4] = '''Empty'''
 enums['MAV_CMD'][191].param[5] = '''Empty'''
 enums['MAV_CMD'][191].param[6] = '''Empty'''
 enums['MAV_CMD'][191].param[7] = '''Empty'''
+MAV_CMD_DO_REPOSITION = 192 # Reposition the vehicle to a specific WGS84 global position.
+enums['MAV_CMD'][192] = EnumEntry('MAV_CMD_DO_REPOSITION', '''Reposition the vehicle to a specific WGS84 global position.''')
+enums['MAV_CMD'][192].param[1] = '''Ground speed, less than 0 (-1) for default'''
+enums['MAV_CMD'][192].param[2] = '''Reserved'''
+enums['MAV_CMD'][192].param[3] = '''Reserved'''
+enums['MAV_CMD'][192].param[4] = '''Yaw heading, NaN for unchanged'''
+enums['MAV_CMD'][192].param[5] = '''Latitude (deg * 1E7)'''
+enums['MAV_CMD'][192].param[6] = '''Longitude (deg * 1E7)'''
+enums['MAV_CMD'][192].param[7] = '''Altitude (meters)'''
+MAV_CMD_DO_PAUSE_CONTINUE = 193 # If in a GPS controlled position mode, hold the current position or
+                        # continue.
+enums['MAV_CMD'][193] = EnumEntry('MAV_CMD_DO_PAUSE_CONTINUE', '''If in a GPS controlled position mode, hold the current position or continue.''')
+enums['MAV_CMD'][193].param[1] = '''0: Pause current mission or reposition command, hold current position. 1: Continue mission. A VTOL capable vehicle should enter hover mode (multicopter and VTOL planes). A plane should loiter with the default loiter radius.'''
+enums['MAV_CMD'][193].param[2] = '''Reserved'''
+enums['MAV_CMD'][193].param[3] = '''Reserved'''
+enums['MAV_CMD'][193].param[4] = '''Reserved'''
+enums['MAV_CMD'][193].param[5] = '''Reserved'''
+enums['MAV_CMD'][193].param[6] = '''Reserved'''
+enums['MAV_CMD'][193].param[7] = '''Reserved'''
 MAV_CMD_DO_CONTROL_VIDEO = 200 # Control onboard camera system.
 enums['MAV_CMD'][200] = EnumEntry('MAV_CMD_DO_CONTROL_VIDEO', '''Control onboard camera system.''')
 enums['MAV_CMD'][200].param[1] = '''Camera ID (-1 for all)'''
@@ -733,13 +788,13 @@ enums['MAV_CMD'][245].param[6] = '''Empty'''
 enums['MAV_CMD'][245].param[7] = '''Empty'''
 MAV_CMD_PREFLIGHT_REBOOT_SHUTDOWN = 246 # Request the reboot or shutdown of system components.
 enums['MAV_CMD'][246] = EnumEntry('MAV_CMD_PREFLIGHT_REBOOT_SHUTDOWN', '''Request the reboot or shutdown of system components.''')
-enums['MAV_CMD'][246].param[1] = '''0: Do nothing for autopilot, 1: Reboot autopilot, 2: Shutdown autopilot.'''
-enums['MAV_CMD'][246].param[2] = '''0: Do nothing for onboard computer, 1: Reboot onboard computer, 2: Shutdown onboard computer.'''
-enums['MAV_CMD'][246].param[3] = '''Reserved'''
-enums['MAV_CMD'][246].param[4] = '''Reserved'''
-enums['MAV_CMD'][246].param[5] = '''Empty'''
-enums['MAV_CMD'][246].param[6] = '''Empty'''
-enums['MAV_CMD'][246].param[7] = '''Empty'''
+enums['MAV_CMD'][246].param[1] = '''0: Do nothing for autopilot, 1: Reboot autopilot, 2: Shutdown autopilot, 3: Reboot autopilot and keep it in the bootloader until upgraded.'''
+enums['MAV_CMD'][246].param[2] = '''0: Do nothing for onboard computer, 1: Reboot onboard computer, 2: Shutdown onboard computer, 3: Reboot onboard computer and keep it in the bootloader until upgraded.'''
+enums['MAV_CMD'][246].param[3] = '''Reserved, send 0'''
+enums['MAV_CMD'][246].param[4] = '''Reserved, send 0'''
+enums['MAV_CMD'][246].param[5] = '''Reserved, send 0'''
+enums['MAV_CMD'][246].param[6] = '''Reserved, send 0'''
+enums['MAV_CMD'][246].param[7] = '''Reserved, send 0'''
 MAV_CMD_OVERRIDE_GOTO = 252 # Hold / continue the current action
 enums['MAV_CMD'][252] = EnumEntry('MAV_CMD_OVERRIDE_GOTO', '''Hold / continue the current action''')
 enums['MAV_CMD'][252].param[1] = '''MAV_GOTO_DO_HOLD: hold MAV_GOTO_DO_CONTINUE: continue with next item in mission plan'''
@@ -835,13 +890,204 @@ enums['MAV_CMD'][30002].param[4] = '''Reserved'''
 enums['MAV_CMD'][30002].param[5] = '''Reserved'''
 enums['MAV_CMD'][30002].param[6] = '''Reserved'''
 enums['MAV_CMD'][30002].param[7] = '''Reserved'''
+MAV_CMD_WAYPOINT_USER_1 = 31000 # User defined waypoint item. Ground Station will show the Vehicle as
+                        # flying through this item.
+enums['MAV_CMD'][31000] = EnumEntry('MAV_CMD_WAYPOINT_USER_1', '''User defined waypoint item. Ground Station will show the Vehicle as flying through this item.''')
+enums['MAV_CMD'][31000].param[1] = '''User defined'''
+enums['MAV_CMD'][31000].param[2] = '''User defined'''
+enums['MAV_CMD'][31000].param[3] = '''User defined'''
+enums['MAV_CMD'][31000].param[4] = '''User defined'''
+enums['MAV_CMD'][31000].param[5] = '''Latitude unscaled'''
+enums['MAV_CMD'][31000].param[6] = '''Longitude unscaled'''
+enums['MAV_CMD'][31000].param[7] = '''Altitude, in meters AMSL'''
+MAV_CMD_WAYPOINT_USER_2 = 31001 # User defined waypoint item. Ground Station will show the Vehicle as
+                        # flying through this item.
+enums['MAV_CMD'][31001] = EnumEntry('MAV_CMD_WAYPOINT_USER_2', '''User defined waypoint item. Ground Station will show the Vehicle as flying through this item.''')
+enums['MAV_CMD'][31001].param[1] = '''User defined'''
+enums['MAV_CMD'][31001].param[2] = '''User defined'''
+enums['MAV_CMD'][31001].param[3] = '''User defined'''
+enums['MAV_CMD'][31001].param[4] = '''User defined'''
+enums['MAV_CMD'][31001].param[5] = '''Latitude unscaled'''
+enums['MAV_CMD'][31001].param[6] = '''Longitude unscaled'''
+enums['MAV_CMD'][31001].param[7] = '''Altitude, in meters AMSL'''
+MAV_CMD_WAYPOINT_USER_3 = 31002 # User defined waypoint item. Ground Station will show the Vehicle as
+                        # flying through this item.
+enums['MAV_CMD'][31002] = EnumEntry('MAV_CMD_WAYPOINT_USER_3', '''User defined waypoint item. Ground Station will show the Vehicle as flying through this item.''')
+enums['MAV_CMD'][31002].param[1] = '''User defined'''
+enums['MAV_CMD'][31002].param[2] = '''User defined'''
+enums['MAV_CMD'][31002].param[3] = '''User defined'''
+enums['MAV_CMD'][31002].param[4] = '''User defined'''
+enums['MAV_CMD'][31002].param[5] = '''Latitude unscaled'''
+enums['MAV_CMD'][31002].param[6] = '''Longitude unscaled'''
+enums['MAV_CMD'][31002].param[7] = '''Altitude, in meters AMSL'''
+MAV_CMD_WAYPOINT_USER_4 = 31003 # User defined waypoint item. Ground Station will show the Vehicle as
+                        # flying through this item.
+enums['MAV_CMD'][31003] = EnumEntry('MAV_CMD_WAYPOINT_USER_4', '''User defined waypoint item. Ground Station will show the Vehicle as flying through this item.''')
+enums['MAV_CMD'][31003].param[1] = '''User defined'''
+enums['MAV_CMD'][31003].param[2] = '''User defined'''
+enums['MAV_CMD'][31003].param[3] = '''User defined'''
+enums['MAV_CMD'][31003].param[4] = '''User defined'''
+enums['MAV_CMD'][31003].param[5] = '''Latitude unscaled'''
+enums['MAV_CMD'][31003].param[6] = '''Longitude unscaled'''
+enums['MAV_CMD'][31003].param[7] = '''Altitude, in meters AMSL'''
+MAV_CMD_WAYPOINT_USER_5 = 31004 # User defined waypoint item. Ground Station will show the Vehicle as
+                        # flying through this item.
+enums['MAV_CMD'][31004] = EnumEntry('MAV_CMD_WAYPOINT_USER_5', '''User defined waypoint item. Ground Station will show the Vehicle as flying through this item.''')
+enums['MAV_CMD'][31004].param[1] = '''User defined'''
+enums['MAV_CMD'][31004].param[2] = '''User defined'''
+enums['MAV_CMD'][31004].param[3] = '''User defined'''
+enums['MAV_CMD'][31004].param[4] = '''User defined'''
+enums['MAV_CMD'][31004].param[5] = '''Latitude unscaled'''
+enums['MAV_CMD'][31004].param[6] = '''Longitude unscaled'''
+enums['MAV_CMD'][31004].param[7] = '''Altitude, in meters AMSL'''
+MAV_CMD_SPATIAL_USER_1 = 31005 # User defined spatial item. Ground Station will not show the Vehicle as
+                        # flying through this item. Example: ROI item.
+enums['MAV_CMD'][31005] = EnumEntry('MAV_CMD_SPATIAL_USER_1', '''User defined spatial item. Ground Station will not show the Vehicle as flying through this item. Example: ROI item.''')
+enums['MAV_CMD'][31005].param[1] = '''User defined'''
+enums['MAV_CMD'][31005].param[2] = '''User defined'''
+enums['MAV_CMD'][31005].param[3] = '''User defined'''
+enums['MAV_CMD'][31005].param[4] = '''User defined'''
+enums['MAV_CMD'][31005].param[5] = '''Latitude unscaled'''
+enums['MAV_CMD'][31005].param[6] = '''Longitude unscaled'''
+enums['MAV_CMD'][31005].param[7] = '''Altitude, in meters AMSL'''
+MAV_CMD_SPATIAL_USER_2 = 31006 # User defined spatial item. Ground Station will not show the Vehicle as
+                        # flying through this item. Example: ROI item.
+enums['MAV_CMD'][31006] = EnumEntry('MAV_CMD_SPATIAL_USER_2', '''User defined spatial item. Ground Station will not show the Vehicle as flying through this item. Example: ROI item.''')
+enums['MAV_CMD'][31006].param[1] = '''User defined'''
+enums['MAV_CMD'][31006].param[2] = '''User defined'''
+enums['MAV_CMD'][31006].param[3] = '''User defined'''
+enums['MAV_CMD'][31006].param[4] = '''User defined'''
+enums['MAV_CMD'][31006].param[5] = '''Latitude unscaled'''
+enums['MAV_CMD'][31006].param[6] = '''Longitude unscaled'''
+enums['MAV_CMD'][31006].param[7] = '''Altitude, in meters AMSL'''
+MAV_CMD_SPATIAL_USER_3 = 31007 # User defined spatial item. Ground Station will not show the Vehicle as
+                        # flying through this item. Example: ROI item.
+enums['MAV_CMD'][31007] = EnumEntry('MAV_CMD_SPATIAL_USER_3', '''User defined spatial item. Ground Station will not show the Vehicle as flying through this item. Example: ROI item.''')
+enums['MAV_CMD'][31007].param[1] = '''User defined'''
+enums['MAV_CMD'][31007].param[2] = '''User defined'''
+enums['MAV_CMD'][31007].param[3] = '''User defined'''
+enums['MAV_CMD'][31007].param[4] = '''User defined'''
+enums['MAV_CMD'][31007].param[5] = '''Latitude unscaled'''
+enums['MAV_CMD'][31007].param[6] = '''Longitude unscaled'''
+enums['MAV_CMD'][31007].param[7] = '''Altitude, in meters AMSL'''
+MAV_CMD_SPATIAL_USER_4 = 31008 # User defined spatial item. Ground Station will not show the Vehicle as
+                        # flying through this item. Example: ROI item.
+enums['MAV_CMD'][31008] = EnumEntry('MAV_CMD_SPATIAL_USER_4', '''User defined spatial item. Ground Station will not show the Vehicle as flying through this item. Example: ROI item.''')
+enums['MAV_CMD'][31008].param[1] = '''User defined'''
+enums['MAV_CMD'][31008].param[2] = '''User defined'''
+enums['MAV_CMD'][31008].param[3] = '''User defined'''
+enums['MAV_CMD'][31008].param[4] = '''User defined'''
+enums['MAV_CMD'][31008].param[5] = '''Latitude unscaled'''
+enums['MAV_CMD'][31008].param[6] = '''Longitude unscaled'''
+enums['MAV_CMD'][31008].param[7] = '''Altitude, in meters AMSL'''
+MAV_CMD_SPATIAL_USER_5 = 31009 # User defined spatial item. Ground Station will not show the Vehicle as
+                        # flying through this item. Example: ROI item.
+enums['MAV_CMD'][31009] = EnumEntry('MAV_CMD_SPATIAL_USER_5', '''User defined spatial item. Ground Station will not show the Vehicle as flying through this item. Example: ROI item.''')
+enums['MAV_CMD'][31009].param[1] = '''User defined'''
+enums['MAV_CMD'][31009].param[2] = '''User defined'''
+enums['MAV_CMD'][31009].param[3] = '''User defined'''
+enums['MAV_CMD'][31009].param[4] = '''User defined'''
+enums['MAV_CMD'][31009].param[5] = '''Latitude unscaled'''
+enums['MAV_CMD'][31009].param[6] = '''Longitude unscaled'''
+enums['MAV_CMD'][31009].param[7] = '''Altitude, in meters AMSL'''
+MAV_CMD_USER_1 = 31010 # User defined command. Ground Station will not show the Vehicle as
+                        # flying through this item. Example:
+                        # MAV_CMD_DO_SET_PARAMETER item.
+enums['MAV_CMD'][31010] = EnumEntry('MAV_CMD_USER_1', '''User defined command. Ground Station will not show the Vehicle as flying through this item. Example: MAV_CMD_DO_SET_PARAMETER item.''')
+enums['MAV_CMD'][31010].param[1] = '''User defined'''
+enums['MAV_CMD'][31010].param[2] = '''User defined'''
+enums['MAV_CMD'][31010].param[3] = '''User defined'''
+enums['MAV_CMD'][31010].param[4] = '''User defined'''
+enums['MAV_CMD'][31010].param[5] = '''User defined'''
+enums['MAV_CMD'][31010].param[6] = '''User defined'''
+enums['MAV_CMD'][31010].param[7] = '''User defined'''
+MAV_CMD_USER_2 = 31011 # User defined command. Ground Station will not show the Vehicle as
+                        # flying through this item. Example:
+                        # MAV_CMD_DO_SET_PARAMETER item.
+enums['MAV_CMD'][31011] = EnumEntry('MAV_CMD_USER_2', '''User defined command. Ground Station will not show the Vehicle as flying through this item. Example: MAV_CMD_DO_SET_PARAMETER item.''')
+enums['MAV_CMD'][31011].param[1] = '''User defined'''
+enums['MAV_CMD'][31011].param[2] = '''User defined'''
+enums['MAV_CMD'][31011].param[3] = '''User defined'''
+enums['MAV_CMD'][31011].param[4] = '''User defined'''
+enums['MAV_CMD'][31011].param[5] = '''User defined'''
+enums['MAV_CMD'][31011].param[6] = '''User defined'''
+enums['MAV_CMD'][31011].param[7] = '''User defined'''
+MAV_CMD_USER_3 = 31012 # User defined command. Ground Station will not show the Vehicle as
+                        # flying through this item. Example:
+                        # MAV_CMD_DO_SET_PARAMETER item.
+enums['MAV_CMD'][31012] = EnumEntry('MAV_CMD_USER_3', '''User defined command. Ground Station will not show the Vehicle as flying through this item. Example: MAV_CMD_DO_SET_PARAMETER item.''')
+enums['MAV_CMD'][31012].param[1] = '''User defined'''
+enums['MAV_CMD'][31012].param[2] = '''User defined'''
+enums['MAV_CMD'][31012].param[3] = '''User defined'''
+enums['MAV_CMD'][31012].param[4] = '''User defined'''
+enums['MAV_CMD'][31012].param[5] = '''User defined'''
+enums['MAV_CMD'][31012].param[6] = '''User defined'''
+enums['MAV_CMD'][31012].param[7] = '''User defined'''
+MAV_CMD_USER_4 = 31013 # User defined command. Ground Station will not show the Vehicle as
+                        # flying through this item. Example:
+                        # MAV_CMD_DO_SET_PARAMETER item.
+enums['MAV_CMD'][31013] = EnumEntry('MAV_CMD_USER_4', '''User defined command. Ground Station will not show the Vehicle as flying through this item. Example: MAV_CMD_DO_SET_PARAMETER item.''')
+enums['MAV_CMD'][31013].param[1] = '''User defined'''
+enums['MAV_CMD'][31013].param[2] = '''User defined'''
+enums['MAV_CMD'][31013].param[3] = '''User defined'''
+enums['MAV_CMD'][31013].param[4] = '''User defined'''
+enums['MAV_CMD'][31013].param[5] = '''User defined'''
+enums['MAV_CMD'][31013].param[6] = '''User defined'''
+enums['MAV_CMD'][31013].param[7] = '''User defined'''
+MAV_CMD_USER_5 = 31014 # User defined command. Ground Station will not show the Vehicle as
+                        # flying through this item. Example:
+                        # MAV_CMD_DO_SET_PARAMETER item.
+enums['MAV_CMD'][31014] = EnumEntry('MAV_CMD_USER_5', '''User defined command. Ground Station will not show the Vehicle as flying through this item. Example: MAV_CMD_DO_SET_PARAMETER item.''')
+enums['MAV_CMD'][31014].param[1] = '''User defined'''
+enums['MAV_CMD'][31014].param[2] = '''User defined'''
+enums['MAV_CMD'][31014].param[3] = '''User defined'''
+enums['MAV_CMD'][31014].param[4] = '''User defined'''
+enums['MAV_CMD'][31014].param[5] = '''User defined'''
+enums['MAV_CMD'][31014].param[6] = '''User defined'''
+enums['MAV_CMD'][31014].param[7] = '''User defined'''
+MAV_CMD_POWER_OFF_INITIATED = 42000 # A system wide power-off event has been initiated.
+enums['MAV_CMD'][42000] = EnumEntry('MAV_CMD_POWER_OFF_INITIATED', '''A system wide power-off event has been initiated.''')
+enums['MAV_CMD'][42000].param[1] = '''Empty'''
+enums['MAV_CMD'][42000].param[2] = '''Empty'''
+enums['MAV_CMD'][42000].param[3] = '''Empty'''
+enums['MAV_CMD'][42000].param[4] = '''Empty'''
+enums['MAV_CMD'][42000].param[5] = '''Empty'''
+enums['MAV_CMD'][42000].param[6] = '''Empty'''
+enums['MAV_CMD'][42000].param[7] = '''Empty'''
+MAV_CMD_SOLO_BTN_FLY_CLICK = 42001 # FLY button has been clicked.
+enums['MAV_CMD'][42001] = EnumEntry('MAV_CMD_SOLO_BTN_FLY_CLICK', '''FLY button has been clicked.''')
+enums['MAV_CMD'][42001].param[1] = '''Empty'''
+enums['MAV_CMD'][42001].param[2] = '''Empty'''
+enums['MAV_CMD'][42001].param[3] = '''Empty'''
+enums['MAV_CMD'][42001].param[4] = '''Empty'''
+enums['MAV_CMD'][42001].param[5] = '''Empty'''
+enums['MAV_CMD'][42001].param[6] = '''Empty'''
+enums['MAV_CMD'][42001].param[7] = '''Empty'''
+MAV_CMD_SOLO_BTN_FLY_HOLD = 42002 # FLY button has been held for 1.5 seconds.
+enums['MAV_CMD'][42002] = EnumEntry('MAV_CMD_SOLO_BTN_FLY_HOLD', '''FLY button has been held for 1.5 seconds.''')
+enums['MAV_CMD'][42002].param[1] = '''Takeoff altitude'''
+enums['MAV_CMD'][42002].param[2] = '''Empty'''
+enums['MAV_CMD'][42002].param[3] = '''Empty'''
+enums['MAV_CMD'][42002].param[4] = '''Empty'''
+enums['MAV_CMD'][42002].param[5] = '''Empty'''
+enums['MAV_CMD'][42002].param[6] = '''Empty'''
+enums['MAV_CMD'][42002].param[7] = '''Empty'''
+MAV_CMD_SOLO_BTN_PAUSE_CLICK = 42003 # PAUSE button has been clicked.
+enums['MAV_CMD'][42003] = EnumEntry('MAV_CMD_SOLO_BTN_PAUSE_CLICK', '''PAUSE button has been clicked.''')
+enums['MAV_CMD'][42003].param[1] = '''1 if Solo is in a shot mode, 0 otherwise'''
+enums['MAV_CMD'][42003].param[2] = '''Empty'''
+enums['MAV_CMD'][42003].param[3] = '''Empty'''
+enums['MAV_CMD'][42003].param[4] = '''Empty'''
+enums['MAV_CMD'][42003].param[5] = '''Empty'''
+enums['MAV_CMD'][42003].param[6] = '''Empty'''
+enums['MAV_CMD'][42003].param[7] = '''Empty'''
 MAV_CMD_DO_START_MAG_CAL = 42424 # Initiate a magnetometer calibration
 enums['MAV_CMD'][42424] = EnumEntry('MAV_CMD_DO_START_MAG_CAL', '''Initiate a magnetometer calibration''')
 enums['MAV_CMD'][42424].param[1] = '''uint8_t bitmask of magnetometers (0 means all)'''
 enums['MAV_CMD'][42424].param[2] = '''Automatically retry on failure (0=no retry, 1=retry).'''
 enums['MAV_CMD'][42424].param[3] = '''Save without user input (0=require input, 1=autosave).'''
 enums['MAV_CMD'][42424].param[4] = '''Delay (seconds)'''
-enums['MAV_CMD'][42424].param[5] = '''Empty'''
+enums['MAV_CMD'][42424].param[5] = '''Autoreboot (0=user reboot, 1=autoreboot)'''
 enums['MAV_CMD'][42424].param[6] = '''Empty'''
 enums['MAV_CMD'][42424].param[7] = '''Empty'''
 MAV_CMD_DO_ACCEPT_MAG_CAL = 42425 # Initiate a magnetometer calibration
@@ -862,46 +1108,101 @@ enums['MAV_CMD'][42426].param[4] = '''Empty'''
 enums['MAV_CMD'][42426].param[5] = '''Empty'''
 enums['MAV_CMD'][42426].param[6] = '''Empty'''
 enums['MAV_CMD'][42426].param[7] = '''Empty'''
-MAV_CMD_ENUM_END = 42427 # 
-enums['MAV_CMD'][42427] = EnumEntry('MAV_CMD_ENUM_END', '''''')
+MAV_CMD_SET_FACTORY_TEST_MODE = 42427 # Command autopilot to get into factory test/diagnostic mode
+enums['MAV_CMD'][42427] = EnumEntry('MAV_CMD_SET_FACTORY_TEST_MODE', '''Command autopilot to get into factory test/diagnostic mode''')
+enums['MAV_CMD'][42427].param[1] = '''0 means get out of test mode, 1 means get into test mode'''
+enums['MAV_CMD'][42427].param[2] = '''Empty'''
+enums['MAV_CMD'][42427].param[3] = '''Empty'''
+enums['MAV_CMD'][42427].param[4] = '''Empty'''
+enums['MAV_CMD'][42427].param[5] = '''Empty'''
+enums['MAV_CMD'][42427].param[6] = '''Empty'''
+enums['MAV_CMD'][42427].param[7] = '''Empty'''
+MAV_CMD_DO_SEND_BANNER = 42428 # Reply with the version banner
+enums['MAV_CMD'][42428] = EnumEntry('MAV_CMD_DO_SEND_BANNER', '''Reply with the version banner''')
+enums['MAV_CMD'][42428].param[1] = '''Empty'''
+enums['MAV_CMD'][42428].param[2] = '''Empty'''
+enums['MAV_CMD'][42428].param[3] = '''Empty'''
+enums['MAV_CMD'][42428].param[4] = '''Empty'''
+enums['MAV_CMD'][42428].param[5] = '''Empty'''
+enums['MAV_CMD'][42428].param[6] = '''Empty'''
+enums['MAV_CMD'][42428].param[7] = '''Empty'''
+MAV_CMD_GIMBAL_RESET = 42501 # Causes the gimbal to reset and boot as if it was just powered on
+enums['MAV_CMD'][42501] = EnumEntry('MAV_CMD_GIMBAL_RESET', '''Causes the gimbal to reset and boot as if it was just powered on''')
+enums['MAV_CMD'][42501].param[1] = '''Empty'''
+enums['MAV_CMD'][42501].param[2] = '''Empty'''
+enums['MAV_CMD'][42501].param[3] = '''Empty'''
+enums['MAV_CMD'][42501].param[4] = '''Empty'''
+enums['MAV_CMD'][42501].param[5] = '''Empty'''
+enums['MAV_CMD'][42501].param[6] = '''Empty'''
+enums['MAV_CMD'][42501].param[7] = '''Empty'''
+MAV_CMD_GIMBAL_AXIS_CALIBRATION_STATUS = 42502 # Reports progress and success or failure of gimbal axis calibration
+                        # procedure
+enums['MAV_CMD'][42502] = EnumEntry('MAV_CMD_GIMBAL_AXIS_CALIBRATION_STATUS', '''Reports progress and success or failure of gimbal axis calibration procedure''')
+enums['MAV_CMD'][42502].param[1] = '''Gimbal axis we're reporting calibration progress for'''
+enums['MAV_CMD'][42502].param[2] = '''Current calibration progress for this axis, 0x64=100%'''
+enums['MAV_CMD'][42502].param[3] = '''Status of the calibration'''
+enums['MAV_CMD'][42502].param[4] = '''Empty'''
+enums['MAV_CMD'][42502].param[5] = '''Empty'''
+enums['MAV_CMD'][42502].param[6] = '''Empty'''
+enums['MAV_CMD'][42502].param[7] = '''Empty'''
+MAV_CMD_GIMBAL_REQUEST_AXIS_CALIBRATION = 42503 # Starts commutation calibration on the gimbal
+enums['MAV_CMD'][42503] = EnumEntry('MAV_CMD_GIMBAL_REQUEST_AXIS_CALIBRATION', '''Starts commutation calibration on the gimbal''')
+enums['MAV_CMD'][42503].param[1] = '''Empty'''
+enums['MAV_CMD'][42503].param[2] = '''Empty'''
+enums['MAV_CMD'][42503].param[3] = '''Empty'''
+enums['MAV_CMD'][42503].param[4] = '''Empty'''
+enums['MAV_CMD'][42503].param[5] = '''Empty'''
+enums['MAV_CMD'][42503].param[6] = '''Empty'''
+enums['MAV_CMD'][42503].param[7] = '''Empty'''
+MAV_CMD_GIMBAL_FULL_RESET = 42505 # Erases gimbal application and parameters
+enums['MAV_CMD'][42505] = EnumEntry('MAV_CMD_GIMBAL_FULL_RESET', '''Erases gimbal application and parameters''')
+enums['MAV_CMD'][42505].param[1] = '''Magic number'''
+enums['MAV_CMD'][42505].param[2] = '''Magic number'''
+enums['MAV_CMD'][42505].param[3] = '''Magic number'''
+enums['MAV_CMD'][42505].param[4] = '''Magic number'''
+enums['MAV_CMD'][42505].param[5] = '''Magic number'''
+enums['MAV_CMD'][42505].param[6] = '''Magic number'''
+enums['MAV_CMD'][42505].param[7] = '''Magic number'''
+MAV_CMD_ENUM_END = 42506 # 
+enums['MAV_CMD'][42506] = EnumEntry('MAV_CMD_ENUM_END', '''''')
 
 # LIMITS_STATE
 enums['LIMITS_STATE'] = {}
-LIMITS_INIT = 0 #  pre-initialization
-enums['LIMITS_STATE'][0] = EnumEntry('LIMITS_INIT', ''' pre-initialization''')
-LIMITS_DISABLED = 1 #  disabled
-enums['LIMITS_STATE'][1] = EnumEntry('LIMITS_DISABLED', ''' disabled''')
-LIMITS_ENABLED = 2 #  checking limits
-enums['LIMITS_STATE'][2] = EnumEntry('LIMITS_ENABLED', ''' checking limits''')
-LIMITS_TRIGGERED = 3 #  a limit has been breached
-enums['LIMITS_STATE'][3] = EnumEntry('LIMITS_TRIGGERED', ''' a limit has been breached''')
-LIMITS_RECOVERING = 4 #  taking action eg. RTL
-enums['LIMITS_STATE'][4] = EnumEntry('LIMITS_RECOVERING', ''' taking action eg. RTL''')
-LIMITS_RECOVERED = 5 #  we're no longer in breach of a limit
-enums['LIMITS_STATE'][5] = EnumEntry('LIMITS_RECOVERED', ''' we're no longer in breach of a limit''')
+LIMITS_INIT = 0 # pre-initialization
+enums['LIMITS_STATE'][0] = EnumEntry('LIMITS_INIT', '''pre-initialization''')
+LIMITS_DISABLED = 1 # disabled
+enums['LIMITS_STATE'][1] = EnumEntry('LIMITS_DISABLED', '''disabled''')
+LIMITS_ENABLED = 2 # checking limits
+enums['LIMITS_STATE'][2] = EnumEntry('LIMITS_ENABLED', '''checking limits''')
+LIMITS_TRIGGERED = 3 # a limit has been breached
+enums['LIMITS_STATE'][3] = EnumEntry('LIMITS_TRIGGERED', '''a limit has been breached''')
+LIMITS_RECOVERING = 4 # taking action eg. RTL
+enums['LIMITS_STATE'][4] = EnumEntry('LIMITS_RECOVERING', '''taking action eg. RTL''')
+LIMITS_RECOVERED = 5 # we're no longer in breach of a limit
+enums['LIMITS_STATE'][5] = EnumEntry('LIMITS_RECOVERED', '''we're no longer in breach of a limit''')
 LIMITS_STATE_ENUM_END = 6 # 
 enums['LIMITS_STATE'][6] = EnumEntry('LIMITS_STATE_ENUM_END', '''''')
 
 # LIMIT_MODULE
 enums['LIMIT_MODULE'] = {}
-LIMIT_GPSLOCK = 1 #  pre-initialization
-enums['LIMIT_MODULE'][1] = EnumEntry('LIMIT_GPSLOCK', ''' pre-initialization''')
-LIMIT_GEOFENCE = 2 #  disabled
-enums['LIMIT_MODULE'][2] = EnumEntry('LIMIT_GEOFENCE', ''' disabled''')
-LIMIT_ALTITUDE = 4 #  checking limits
-enums['LIMIT_MODULE'][4] = EnumEntry('LIMIT_ALTITUDE', ''' checking limits''')
+LIMIT_GPSLOCK = 1 # pre-initialization
+enums['LIMIT_MODULE'][1] = EnumEntry('LIMIT_GPSLOCK', '''pre-initialization''')
+LIMIT_GEOFENCE = 2 # disabled
+enums['LIMIT_MODULE'][2] = EnumEntry('LIMIT_GEOFENCE', '''disabled''')
+LIMIT_ALTITUDE = 4 # checking limits
+enums['LIMIT_MODULE'][4] = EnumEntry('LIMIT_ALTITUDE', '''checking limits''')
 LIMIT_MODULE_ENUM_END = 5 # 
 enums['LIMIT_MODULE'][5] = EnumEntry('LIMIT_MODULE_ENUM_END', '''''')
 
 # RALLY_FLAGS
 enums['RALLY_FLAGS'] = {}
 FAVORABLE_WIND = 1 # Flag set when requiring favorable winds for landing.
-enums['RALLY_FLAGS'][1] = EnumEntry('FAVORABLE_WIND', '''Flag set when requiring favorable winds for landing. ''')
+enums['RALLY_FLAGS'][1] = EnumEntry('FAVORABLE_WIND', '''Flag set when requiring favorable winds for landing.''')
 LAND_IMMEDIATELY = 2 # Flag set when plane is to immediately descend to break altitude and
-                        # land without GCS intervention.  Flag not set
+                        # land without GCS intervention. Flag not set
                         # when plane is to loiter at Rally point until
                         # commanded to land.
-enums['RALLY_FLAGS'][2] = EnumEntry('LAND_IMMEDIATELY', '''Flag set when plane is to immediately descend to break altitude and land without GCS intervention.  Flag not set when plane is to loiter at Rally point until commanded to land.''')
+enums['RALLY_FLAGS'][2] = EnumEntry('LAND_IMMEDIATELY', '''Flag set when plane is to immediately descend to break altitude and land without GCS intervention. Flag not set when plane is to loiter at Rally point until commanded to land.''')
 RALLY_FLAGS_ENUM_END = 3 # 
 enums['RALLY_FLAGS'][3] = EnumEntry('RALLY_FLAGS_ENUM_END', '''''')
 
@@ -991,10 +1292,10 @@ enums['MAV_MODE_GIMBAL'][4] = EnumEntry('MAV_MODE_GIMBAL_INITIALIZED', '''Gimbal
 MAV_MODE_GIMBAL_ACTIVE = 5 # Gimbal is actively stabilizing
 enums['MAV_MODE_GIMBAL'][5] = EnumEntry('MAV_MODE_GIMBAL_ACTIVE', '''Gimbal is actively stabilizing''')
 MAV_MODE_GIMBAL_RATE_CMD_TIMEOUT = 6 # Gimbal is relaxed because it missed more than 10 expected rate command
-                        # messages in a row.  Gimbal will move back to
+                        # messages in a row. Gimbal will move back to
                         # active mode when it receives a new rate
                         # command
-enums['MAV_MODE_GIMBAL'][6] = EnumEntry('MAV_MODE_GIMBAL_RATE_CMD_TIMEOUT', '''Gimbal is relaxed because it missed more than 10 expected rate command messages in a row.  Gimbal will move back to active mode when it receives a new rate command''')
+enums['MAV_MODE_GIMBAL'][6] = EnumEntry('MAV_MODE_GIMBAL_RATE_CMD_TIMEOUT', '''Gimbal is relaxed because it missed more than 10 expected rate command messages in a row. Gimbal will move back to active mode when it receives a new rate command''')
 MAV_MODE_GIMBAL_ENUM_END = 7 # 
 enums['MAV_MODE_GIMBAL'][7] = EnumEntry('MAV_MODE_GIMBAL_ENUM_END', '''''')
 
@@ -1020,48 +1321,350 @@ enums['GIMBAL_AXIS_CALIBRATION_STATUS'][2] = EnumEntry('GIMBAL_AXIS_CALIBRATION_
 GIMBAL_AXIS_CALIBRATION_STATUS_ENUM_END = 3 # 
 enums['GIMBAL_AXIS_CALIBRATION_STATUS'][3] = EnumEntry('GIMBAL_AXIS_CALIBRATION_STATUS_ENUM_END', '''''')
 
-# FACTORY_TEST
-enums['FACTORY_TEST'] = {}
-FACTORY_TEST_AXIS_RANGE_LIMITS = 0 # Tests to make sure each axis can move to its mechanical limits
-enums['FACTORY_TEST'][0] = EnumEntry('FACTORY_TEST_AXIS_RANGE_LIMITS', '''Tests to make sure each axis can move to its mechanical limits''')
-FACTORY_TEST_ENUM_END = 1 # 
-enums['FACTORY_TEST'][1] = EnumEntry('FACTORY_TEST_ENUM_END', '''''')
+# GIMBAL_AXIS_CALIBRATION_REQUIRED
+enums['GIMBAL_AXIS_CALIBRATION_REQUIRED'] = {}
+GIMBAL_AXIS_CALIBRATION_REQUIRED_UNKNOWN = 0 # Whether or not this axis requires calibration is unknown at this time
+enums['GIMBAL_AXIS_CALIBRATION_REQUIRED'][0] = EnumEntry('GIMBAL_AXIS_CALIBRATION_REQUIRED_UNKNOWN', '''Whether or not this axis requires calibration is unknown at this time''')
+GIMBAL_AXIS_CALIBRATION_REQUIRED_TRUE = 1 # This axis requires calibration
+enums['GIMBAL_AXIS_CALIBRATION_REQUIRED'][1] = EnumEntry('GIMBAL_AXIS_CALIBRATION_REQUIRED_TRUE', '''This axis requires calibration''')
+GIMBAL_AXIS_CALIBRATION_REQUIRED_FALSE = 2 # This axis does not require calibration
+enums['GIMBAL_AXIS_CALIBRATION_REQUIRED'][2] = EnumEntry('GIMBAL_AXIS_CALIBRATION_REQUIRED_FALSE', '''This axis does not require calibration''')
+GIMBAL_AXIS_CALIBRATION_REQUIRED_ENUM_END = 3 # 
+enums['GIMBAL_AXIS_CALIBRATION_REQUIRED'][3] = EnumEntry('GIMBAL_AXIS_CALIBRATION_REQUIRED_ENUM_END', '''''')
 
-# GOPRO_CMD_RESULT
-enums['GOPRO_CMD_RESULT'] = {}
-GOPRO_CMD_RESULT_UNKNOWN = 0 # The result of the command is unknown
-enums['GOPRO_CMD_RESULT'][0] = EnumEntry('GOPRO_CMD_RESULT_UNKNOWN', '''The result of the command is unknown''')
-GOPRO_CMD_RESULT_SUCCESSFUL = 1 # The command was successfully sent, and a response was successfully
-                        # received
-enums['GOPRO_CMD_RESULT'][1] = EnumEntry('GOPRO_CMD_RESULT_SUCCESSFUL', '''The command was successfully sent, and a response was successfully received''')
-GOPRO_CMD_RESULT_SEND_CMD_START_TIMEOUT = 2 # Timed out waiting for the GoPro to acknowledge our request to send a
-                        # command
-enums['GOPRO_CMD_RESULT'][2] = EnumEntry('GOPRO_CMD_RESULT_SEND_CMD_START_TIMEOUT', '''Timed out waiting for the GoPro to acknowledge our request to send a command''')
-GOPRO_CMD_RESULT_SEND_CMD_COMPLETE_TIMEOUT = 3 # Timed out waiting for the GoPro to read the command
-enums['GOPRO_CMD_RESULT'][3] = EnumEntry('GOPRO_CMD_RESULT_SEND_CMD_COMPLETE_TIMEOUT', '''Timed out waiting for the GoPro to read the command''')
-GOPRO_CMD_RESULT_GET_RESPONSE_START_TIMEOUT = 4 # Timed out waiting for the GoPro to begin transmitting a response to
-                        # the command
-enums['GOPRO_CMD_RESULT'][4] = EnumEntry('GOPRO_CMD_RESULT_GET_RESPONSE_START_TIMEOUT', '''Timed out waiting for the GoPro to begin transmitting a response to the command''')
-GOPRO_CMD_RESULT_GET_RESPONSE_COMPLETE_TIMEOUT = 5 # Timed out waiting for the GoPro to finish transmitting a response to
-                        # the command
-enums['GOPRO_CMD_RESULT'][5] = EnumEntry('GOPRO_CMD_RESULT_GET_RESPONSE_COMPLETE_TIMEOUT', '''Timed out waiting for the GoPro to finish transmitting a response to the command''')
-GOPRO_CMD_RESULT_GET_CMD_COMPLETE_TIMEOUT = 6 # Timed out waiting for the GoPro to finish transmitting its own command
-enums['GOPRO_CMD_RESULT'][6] = EnumEntry('GOPRO_CMD_RESULT_GET_CMD_COMPLETE_TIMEOUT', '''Timed out waiting for the GoPro to finish transmitting its own command''')
-GOPRO_CMD_RESULT_SEND_RESPONSE_START_TIMEOUT = 7 # Timed out waiting for the GoPro to start reading a response to its own
-                        # command
-enums['GOPRO_CMD_RESULT'][7] = EnumEntry('GOPRO_CMD_RESULT_SEND_RESPONSE_START_TIMEOUT', '''Timed out waiting for the GoPro to start reading a response to its own command''')
-GOPRO_CMD_RESULT_SEND_RESPONSE_COMPLETE_TIMEOUT = 8 # Timed out waiting for the GoPro to finish reading a response to its
-                        # own command
-enums['GOPRO_CMD_RESULT'][8] = EnumEntry('GOPRO_CMD_RESULT_SEND_RESPONSE_COMPLETE_TIMEOUT', '''Timed out waiting for the GoPro to finish reading a response to its own command''')
-GOPRO_CMD_RESULT_PREEMPTED = 9 # Command to the GoPro was preempted by the GoPro sending its own
-                        # command
-enums['GOPRO_CMD_RESULT'][9] = EnumEntry('GOPRO_CMD_RESULT_PREEMPTED', '''Command to the GoPro was preempted by the GoPro sending its own command''')
-GOPRO_CMD_RECEIVED_DATA_OVERFLOW = 10 # More data than expected received in response to the command
-enums['GOPRO_CMD_RESULT'][10] = EnumEntry('GOPRO_CMD_RECEIVED_DATA_OVERFLOW', '''More data than expected received in response to the command''')
-GOPRO_CMD_RECEIVED_DATA_UNDERFLOW = 11 # Less data than expected received in response to the command
-enums['GOPRO_CMD_RESULT'][11] = EnumEntry('GOPRO_CMD_RECEIVED_DATA_UNDERFLOW', '''Less data than expected received in response to the command''')
-GOPRO_CMD_RESULT_ENUM_END = 12 # 
-enums['GOPRO_CMD_RESULT'][12] = EnumEntry('GOPRO_CMD_RESULT_ENUM_END', '''''')
+# GOPRO_HEARTBEAT_STATUS
+enums['GOPRO_HEARTBEAT_STATUS'] = {}
+GOPRO_HEARTBEAT_STATUS_DISCONNECTED = 0 # No GoPro connected
+enums['GOPRO_HEARTBEAT_STATUS'][0] = EnumEntry('GOPRO_HEARTBEAT_STATUS_DISCONNECTED', '''No GoPro connected''')
+GOPRO_HEARTBEAT_STATUS_INCOMPATIBLE = 1 # The detected GoPro is not HeroBus compatible
+enums['GOPRO_HEARTBEAT_STATUS'][1] = EnumEntry('GOPRO_HEARTBEAT_STATUS_INCOMPATIBLE', '''The detected GoPro is not HeroBus compatible''')
+GOPRO_HEARTBEAT_STATUS_CONNECTED = 2 # A HeroBus compatible GoPro is connected
+enums['GOPRO_HEARTBEAT_STATUS'][2] = EnumEntry('GOPRO_HEARTBEAT_STATUS_CONNECTED', '''A HeroBus compatible GoPro is connected''')
+GOPRO_HEARTBEAT_STATUS_ERROR = 3 # An unrecoverable error was encountered with the connected GoPro, it
+                        # may require a power cycle
+enums['GOPRO_HEARTBEAT_STATUS'][3] = EnumEntry('GOPRO_HEARTBEAT_STATUS_ERROR', '''An unrecoverable error was encountered with the connected GoPro, it may require a power cycle''')
+GOPRO_HEARTBEAT_STATUS_ENUM_END = 4 # 
+enums['GOPRO_HEARTBEAT_STATUS'][4] = EnumEntry('GOPRO_HEARTBEAT_STATUS_ENUM_END', '''''')
+
+# GOPRO_HEARTBEAT_FLAGS
+enums['GOPRO_HEARTBEAT_FLAGS'] = {}
+GOPRO_FLAG_RECORDING = 1 # GoPro is currently recording
+enums['GOPRO_HEARTBEAT_FLAGS'][1] = EnumEntry('GOPRO_FLAG_RECORDING', '''GoPro is currently recording''')
+GOPRO_HEARTBEAT_FLAGS_ENUM_END = 2 # 
+enums['GOPRO_HEARTBEAT_FLAGS'][2] = EnumEntry('GOPRO_HEARTBEAT_FLAGS_ENUM_END', '''''')
+
+# GOPRO_REQUEST_STATUS
+enums['GOPRO_REQUEST_STATUS'] = {}
+GOPRO_REQUEST_SUCCESS = 0 # The write message with ID indicated succeeded
+enums['GOPRO_REQUEST_STATUS'][0] = EnumEntry('GOPRO_REQUEST_SUCCESS', '''The write message with ID indicated succeeded''')
+GOPRO_REQUEST_FAILED = 1 # The write message with ID indicated failed
+enums['GOPRO_REQUEST_STATUS'][1] = EnumEntry('GOPRO_REQUEST_FAILED', '''The write message with ID indicated failed''')
+GOPRO_REQUEST_STATUS_ENUM_END = 2 # 
+enums['GOPRO_REQUEST_STATUS'][2] = EnumEntry('GOPRO_REQUEST_STATUS_ENUM_END', '''''')
+
+# GOPRO_COMMAND
+enums['GOPRO_COMMAND'] = {}
+GOPRO_COMMAND_POWER = 0 # (Get/Set)
+enums['GOPRO_COMMAND'][0] = EnumEntry('GOPRO_COMMAND_POWER', '''(Get/Set)''')
+GOPRO_COMMAND_CAPTURE_MODE = 1 # (Get/Set)
+enums['GOPRO_COMMAND'][1] = EnumEntry('GOPRO_COMMAND_CAPTURE_MODE', '''(Get/Set)''')
+GOPRO_COMMAND_SHUTTER = 2 # (___/Set)
+enums['GOPRO_COMMAND'][2] = EnumEntry('GOPRO_COMMAND_SHUTTER', '''(___/Set)''')
+GOPRO_COMMAND_BATTERY = 3 # (Get/___)
+enums['GOPRO_COMMAND'][3] = EnumEntry('GOPRO_COMMAND_BATTERY', '''(Get/___)''')
+GOPRO_COMMAND_MODEL = 4 # (Get/___)
+enums['GOPRO_COMMAND'][4] = EnumEntry('GOPRO_COMMAND_MODEL', '''(Get/___)''')
+GOPRO_COMMAND_VIDEO_SETTINGS = 5 # (Get/Set)
+enums['GOPRO_COMMAND'][5] = EnumEntry('GOPRO_COMMAND_VIDEO_SETTINGS', '''(Get/Set)''')
+GOPRO_COMMAND_LOW_LIGHT = 6 # (Get/Set)
+enums['GOPRO_COMMAND'][6] = EnumEntry('GOPRO_COMMAND_LOW_LIGHT', '''(Get/Set)''')
+GOPRO_COMMAND_PHOTO_RESOLUTION = 7 # (Get/Set)
+enums['GOPRO_COMMAND'][7] = EnumEntry('GOPRO_COMMAND_PHOTO_RESOLUTION', '''(Get/Set)''')
+GOPRO_COMMAND_PHOTO_BURST_RATE = 8 # (Get/Set)
+enums['GOPRO_COMMAND'][8] = EnumEntry('GOPRO_COMMAND_PHOTO_BURST_RATE', '''(Get/Set)''')
+GOPRO_COMMAND_PROTUNE = 9 # (Get/Set)
+enums['GOPRO_COMMAND'][9] = EnumEntry('GOPRO_COMMAND_PROTUNE', '''(Get/Set)''')
+GOPRO_COMMAND_PROTUNE_WHITE_BALANCE = 10 # (Get/Set) Hero 3+ Only
+enums['GOPRO_COMMAND'][10] = EnumEntry('GOPRO_COMMAND_PROTUNE_WHITE_BALANCE', '''(Get/Set) Hero 3+ Only''')
+GOPRO_COMMAND_PROTUNE_COLOUR = 11 # (Get/Set) Hero 3+ Only
+enums['GOPRO_COMMAND'][11] = EnumEntry('GOPRO_COMMAND_PROTUNE_COLOUR', '''(Get/Set) Hero 3+ Only''')
+GOPRO_COMMAND_PROTUNE_GAIN = 12 # (Get/Set) Hero 3+ Only
+enums['GOPRO_COMMAND'][12] = EnumEntry('GOPRO_COMMAND_PROTUNE_GAIN', '''(Get/Set) Hero 3+ Only''')
+GOPRO_COMMAND_PROTUNE_SHARPNESS = 13 # (Get/Set) Hero 3+ Only
+enums['GOPRO_COMMAND'][13] = EnumEntry('GOPRO_COMMAND_PROTUNE_SHARPNESS', '''(Get/Set) Hero 3+ Only''')
+GOPRO_COMMAND_PROTUNE_EXPOSURE = 14 # (Get/Set) Hero 3+ Only
+enums['GOPRO_COMMAND'][14] = EnumEntry('GOPRO_COMMAND_PROTUNE_EXPOSURE', '''(Get/Set) Hero 3+ Only''')
+GOPRO_COMMAND_TIME = 15 # (Get/Set)
+enums['GOPRO_COMMAND'][15] = EnumEntry('GOPRO_COMMAND_TIME', '''(Get/Set)''')
+GOPRO_COMMAND_CHARGING = 16 # (Get/Set)
+enums['GOPRO_COMMAND'][16] = EnumEntry('GOPRO_COMMAND_CHARGING', '''(Get/Set)''')
+GOPRO_COMMAND_ENUM_END = 17 # 
+enums['GOPRO_COMMAND'][17] = EnumEntry('GOPRO_COMMAND_ENUM_END', '''''')
+
+# GOPRO_CAPTURE_MODE
+enums['GOPRO_CAPTURE_MODE'] = {}
+GOPRO_CAPTURE_MODE_VIDEO = 0 # Video mode
+enums['GOPRO_CAPTURE_MODE'][0] = EnumEntry('GOPRO_CAPTURE_MODE_VIDEO', '''Video mode''')
+GOPRO_CAPTURE_MODE_PHOTO = 1 # Photo mode
+enums['GOPRO_CAPTURE_MODE'][1] = EnumEntry('GOPRO_CAPTURE_MODE_PHOTO', '''Photo mode''')
+GOPRO_CAPTURE_MODE_BURST = 2 # Burst mode, hero 3+ only
+enums['GOPRO_CAPTURE_MODE'][2] = EnumEntry('GOPRO_CAPTURE_MODE_BURST', '''Burst mode, hero 3+ only''')
+GOPRO_CAPTURE_MODE_TIME_LAPSE = 3 # Time lapse mode, hero 3+ only
+enums['GOPRO_CAPTURE_MODE'][3] = EnumEntry('GOPRO_CAPTURE_MODE_TIME_LAPSE', '''Time lapse mode, hero 3+ only''')
+GOPRO_CAPTURE_MODE_MULTI_SHOT = 4 # Multi shot mode, hero 4 only
+enums['GOPRO_CAPTURE_MODE'][4] = EnumEntry('GOPRO_CAPTURE_MODE_MULTI_SHOT', '''Multi shot mode, hero 4 only''')
+GOPRO_CAPTURE_MODE_PLAYBACK = 5 # Playback mode, hero 4 only, silver only except when LCD or HDMI is
+                        # connected to black
+enums['GOPRO_CAPTURE_MODE'][5] = EnumEntry('GOPRO_CAPTURE_MODE_PLAYBACK', '''Playback mode, hero 4 only, silver only except when LCD or HDMI is connected to black''')
+GOPRO_CAPTURE_MODE_SETUP = 6 # Playback mode, hero 4 only
+enums['GOPRO_CAPTURE_MODE'][6] = EnumEntry('GOPRO_CAPTURE_MODE_SETUP', '''Playback mode, hero 4 only''')
+GOPRO_CAPTURE_MODE_UNKNOWN = 255 # Mode not yet known
+enums['GOPRO_CAPTURE_MODE'][255] = EnumEntry('GOPRO_CAPTURE_MODE_UNKNOWN', '''Mode not yet known''')
+GOPRO_CAPTURE_MODE_ENUM_END = 256 # 
+enums['GOPRO_CAPTURE_MODE'][256] = EnumEntry('GOPRO_CAPTURE_MODE_ENUM_END', '''''')
+
+# GOPRO_RESOLUTION
+enums['GOPRO_RESOLUTION'] = {}
+GOPRO_RESOLUTION_480p = 0 # 848 x 480 (480p)
+enums['GOPRO_RESOLUTION'][0] = EnumEntry('GOPRO_RESOLUTION_480p', '''848 x 480 (480p)''')
+GOPRO_RESOLUTION_720p = 1 # 1280 x 720 (720p)
+enums['GOPRO_RESOLUTION'][1] = EnumEntry('GOPRO_RESOLUTION_720p', '''1280 x 720 (720p)''')
+GOPRO_RESOLUTION_960p = 2 # 1280 x 960 (960p)
+enums['GOPRO_RESOLUTION'][2] = EnumEntry('GOPRO_RESOLUTION_960p', '''1280 x 960 (960p)''')
+GOPRO_RESOLUTION_1080p = 3 # 1920 x 1080 (1080p)
+enums['GOPRO_RESOLUTION'][3] = EnumEntry('GOPRO_RESOLUTION_1080p', '''1920 x 1080 (1080p)''')
+GOPRO_RESOLUTION_1440p = 4 # 1920 x 1440 (1440p)
+enums['GOPRO_RESOLUTION'][4] = EnumEntry('GOPRO_RESOLUTION_1440p', '''1920 x 1440 (1440p)''')
+GOPRO_RESOLUTION_2_7k_17_9 = 5 # 2704 x 1440 (2.7k-17:9)
+enums['GOPRO_RESOLUTION'][5] = EnumEntry('GOPRO_RESOLUTION_2_7k_17_9', '''2704 x 1440 (2.7k-17:9)''')
+GOPRO_RESOLUTION_2_7k_16_9 = 6 # 2704 x 1524 (2.7k-16:9)
+enums['GOPRO_RESOLUTION'][6] = EnumEntry('GOPRO_RESOLUTION_2_7k_16_9', '''2704 x 1524 (2.7k-16:9)''')
+GOPRO_RESOLUTION_2_7k_4_3 = 7 # 2704 x 2028 (2.7k-4:3)
+enums['GOPRO_RESOLUTION'][7] = EnumEntry('GOPRO_RESOLUTION_2_7k_4_3', '''2704 x 2028 (2.7k-4:3)''')
+GOPRO_RESOLUTION_4k_16_9 = 8 # 3840 x 2160 (4k-16:9)
+enums['GOPRO_RESOLUTION'][8] = EnumEntry('GOPRO_RESOLUTION_4k_16_9', '''3840 x 2160 (4k-16:9)''')
+GOPRO_RESOLUTION_4k_17_9 = 9 # 4096 x 2160 (4k-17:9)
+enums['GOPRO_RESOLUTION'][9] = EnumEntry('GOPRO_RESOLUTION_4k_17_9', '''4096 x 2160 (4k-17:9)''')
+GOPRO_RESOLUTION_720p_SUPERVIEW = 10 # 1280 x 720 (720p-SuperView)
+enums['GOPRO_RESOLUTION'][10] = EnumEntry('GOPRO_RESOLUTION_720p_SUPERVIEW', '''1280 x 720 (720p-SuperView)''')
+GOPRO_RESOLUTION_1080p_SUPERVIEW = 11 # 1920 x 1080 (1080p-SuperView)
+enums['GOPRO_RESOLUTION'][11] = EnumEntry('GOPRO_RESOLUTION_1080p_SUPERVIEW', '''1920 x 1080 (1080p-SuperView)''')
+GOPRO_RESOLUTION_2_7k_SUPERVIEW = 12 # 2704 x 1520 (2.7k-SuperView)
+enums['GOPRO_RESOLUTION'][12] = EnumEntry('GOPRO_RESOLUTION_2_7k_SUPERVIEW', '''2704 x 1520 (2.7k-SuperView)''')
+GOPRO_RESOLUTION_4k_SUPERVIEW = 13 # 3840 x 2160 (4k-SuperView)
+enums['GOPRO_RESOLUTION'][13] = EnumEntry('GOPRO_RESOLUTION_4k_SUPERVIEW', '''3840 x 2160 (4k-SuperView)''')
+GOPRO_RESOLUTION_ENUM_END = 14 # 
+enums['GOPRO_RESOLUTION'][14] = EnumEntry('GOPRO_RESOLUTION_ENUM_END', '''''')
+
+# GOPRO_FRAME_RATE
+enums['GOPRO_FRAME_RATE'] = {}
+GOPRO_FRAME_RATE_12 = 0 # 12 FPS
+enums['GOPRO_FRAME_RATE'][0] = EnumEntry('GOPRO_FRAME_RATE_12', '''12 FPS''')
+GOPRO_FRAME_RATE_15 = 1 # 15 FPS
+enums['GOPRO_FRAME_RATE'][1] = EnumEntry('GOPRO_FRAME_RATE_15', '''15 FPS''')
+GOPRO_FRAME_RATE_24 = 2 # 24 FPS
+enums['GOPRO_FRAME_RATE'][2] = EnumEntry('GOPRO_FRAME_RATE_24', '''24 FPS''')
+GOPRO_FRAME_RATE_25 = 3 # 25 FPS
+enums['GOPRO_FRAME_RATE'][3] = EnumEntry('GOPRO_FRAME_RATE_25', '''25 FPS''')
+GOPRO_FRAME_RATE_30 = 4 # 30 FPS
+enums['GOPRO_FRAME_RATE'][4] = EnumEntry('GOPRO_FRAME_RATE_30', '''30 FPS''')
+GOPRO_FRAME_RATE_48 = 5 # 48 FPS
+enums['GOPRO_FRAME_RATE'][5] = EnumEntry('GOPRO_FRAME_RATE_48', '''48 FPS''')
+GOPRO_FRAME_RATE_50 = 6 # 50 FPS
+enums['GOPRO_FRAME_RATE'][6] = EnumEntry('GOPRO_FRAME_RATE_50', '''50 FPS''')
+GOPRO_FRAME_RATE_60 = 7 # 60 FPS
+enums['GOPRO_FRAME_RATE'][7] = EnumEntry('GOPRO_FRAME_RATE_60', '''60 FPS''')
+GOPRO_FRAME_RATE_80 = 8 # 80 FPS
+enums['GOPRO_FRAME_RATE'][8] = EnumEntry('GOPRO_FRAME_RATE_80', '''80 FPS''')
+GOPRO_FRAME_RATE_90 = 9 # 90 FPS
+enums['GOPRO_FRAME_RATE'][9] = EnumEntry('GOPRO_FRAME_RATE_90', '''90 FPS''')
+GOPRO_FRAME_RATE_100 = 10 # 100 FPS
+enums['GOPRO_FRAME_RATE'][10] = EnumEntry('GOPRO_FRAME_RATE_100', '''100 FPS''')
+GOPRO_FRAME_RATE_120 = 11 # 120 FPS
+enums['GOPRO_FRAME_RATE'][11] = EnumEntry('GOPRO_FRAME_RATE_120', '''120 FPS''')
+GOPRO_FRAME_RATE_240 = 12 # 240 FPS
+enums['GOPRO_FRAME_RATE'][12] = EnumEntry('GOPRO_FRAME_RATE_240', '''240 FPS''')
+GOPRO_FRAME_RATE_12_5 = 13 # 12.5 FPS
+enums['GOPRO_FRAME_RATE'][13] = EnumEntry('GOPRO_FRAME_RATE_12_5', '''12.5 FPS''')
+GOPRO_FRAME_RATE_ENUM_END = 14 # 
+enums['GOPRO_FRAME_RATE'][14] = EnumEntry('GOPRO_FRAME_RATE_ENUM_END', '''''')
+
+# GOPRO_FIELD_OF_VIEW
+enums['GOPRO_FIELD_OF_VIEW'] = {}
+GOPRO_FIELD_OF_VIEW_WIDE = 0 # 0x00: Wide
+enums['GOPRO_FIELD_OF_VIEW'][0] = EnumEntry('GOPRO_FIELD_OF_VIEW_WIDE', '''0x00: Wide''')
+GOPRO_FIELD_OF_VIEW_MEDIUM = 1 # 0x01: Medium
+enums['GOPRO_FIELD_OF_VIEW'][1] = EnumEntry('GOPRO_FIELD_OF_VIEW_MEDIUM', '''0x01: Medium''')
+GOPRO_FIELD_OF_VIEW_NARROW = 2 # 0x02: Narrow
+enums['GOPRO_FIELD_OF_VIEW'][2] = EnumEntry('GOPRO_FIELD_OF_VIEW_NARROW', '''0x02: Narrow''')
+GOPRO_FIELD_OF_VIEW_ENUM_END = 3 # 
+enums['GOPRO_FIELD_OF_VIEW'][3] = EnumEntry('GOPRO_FIELD_OF_VIEW_ENUM_END', '''''')
+
+# GOPRO_VIDEO_SETTINGS_FLAGS
+enums['GOPRO_VIDEO_SETTINGS_FLAGS'] = {}
+GOPRO_VIDEO_SETTINGS_TV_MODE = 1 # 0=NTSC, 1=PAL
+enums['GOPRO_VIDEO_SETTINGS_FLAGS'][1] = EnumEntry('GOPRO_VIDEO_SETTINGS_TV_MODE', '''0=NTSC, 1=PAL''')
+GOPRO_VIDEO_SETTINGS_FLAGS_ENUM_END = 2 # 
+enums['GOPRO_VIDEO_SETTINGS_FLAGS'][2] = EnumEntry('GOPRO_VIDEO_SETTINGS_FLAGS_ENUM_END', '''''')
+
+# GOPRO_PHOTO_RESOLUTION
+enums['GOPRO_PHOTO_RESOLUTION'] = {}
+GOPRO_PHOTO_RESOLUTION_5MP_MEDIUM = 0 # 5MP Medium
+enums['GOPRO_PHOTO_RESOLUTION'][0] = EnumEntry('GOPRO_PHOTO_RESOLUTION_5MP_MEDIUM', '''5MP Medium''')
+GOPRO_PHOTO_RESOLUTION_7MP_MEDIUM = 1 # 7MP Medium
+enums['GOPRO_PHOTO_RESOLUTION'][1] = EnumEntry('GOPRO_PHOTO_RESOLUTION_7MP_MEDIUM', '''7MP Medium''')
+GOPRO_PHOTO_RESOLUTION_7MP_WIDE = 2 # 7MP Wide
+enums['GOPRO_PHOTO_RESOLUTION'][2] = EnumEntry('GOPRO_PHOTO_RESOLUTION_7MP_WIDE', '''7MP Wide''')
+GOPRO_PHOTO_RESOLUTION_10MP_WIDE = 3 # 10MP Wide
+enums['GOPRO_PHOTO_RESOLUTION'][3] = EnumEntry('GOPRO_PHOTO_RESOLUTION_10MP_WIDE', '''10MP Wide''')
+GOPRO_PHOTO_RESOLUTION_12MP_WIDE = 4 # 12MP Wide
+enums['GOPRO_PHOTO_RESOLUTION'][4] = EnumEntry('GOPRO_PHOTO_RESOLUTION_12MP_WIDE', '''12MP Wide''')
+GOPRO_PHOTO_RESOLUTION_ENUM_END = 5 # 
+enums['GOPRO_PHOTO_RESOLUTION'][5] = EnumEntry('GOPRO_PHOTO_RESOLUTION_ENUM_END', '''''')
+
+# GOPRO_PROTUNE_WHITE_BALANCE
+enums['GOPRO_PROTUNE_WHITE_BALANCE'] = {}
+GOPRO_PROTUNE_WHITE_BALANCE_AUTO = 0 # Auto
+enums['GOPRO_PROTUNE_WHITE_BALANCE'][0] = EnumEntry('GOPRO_PROTUNE_WHITE_BALANCE_AUTO', '''Auto''')
+GOPRO_PROTUNE_WHITE_BALANCE_3000K = 1 # 3000K
+enums['GOPRO_PROTUNE_WHITE_BALANCE'][1] = EnumEntry('GOPRO_PROTUNE_WHITE_BALANCE_3000K', '''3000K''')
+GOPRO_PROTUNE_WHITE_BALANCE_5500K = 2 # 5500K
+enums['GOPRO_PROTUNE_WHITE_BALANCE'][2] = EnumEntry('GOPRO_PROTUNE_WHITE_BALANCE_5500K', '''5500K''')
+GOPRO_PROTUNE_WHITE_BALANCE_6500K = 3 # 6500K
+enums['GOPRO_PROTUNE_WHITE_BALANCE'][3] = EnumEntry('GOPRO_PROTUNE_WHITE_BALANCE_6500K', '''6500K''')
+GOPRO_PROTUNE_WHITE_BALANCE_RAW = 4 # Camera Raw
+enums['GOPRO_PROTUNE_WHITE_BALANCE'][4] = EnumEntry('GOPRO_PROTUNE_WHITE_BALANCE_RAW', '''Camera Raw''')
+GOPRO_PROTUNE_WHITE_BALANCE_ENUM_END = 5 # 
+enums['GOPRO_PROTUNE_WHITE_BALANCE'][5] = EnumEntry('GOPRO_PROTUNE_WHITE_BALANCE_ENUM_END', '''''')
+
+# GOPRO_PROTUNE_COLOUR
+enums['GOPRO_PROTUNE_COLOUR'] = {}
+GOPRO_PROTUNE_COLOUR_STANDARD = 0 # Auto
+enums['GOPRO_PROTUNE_COLOUR'][0] = EnumEntry('GOPRO_PROTUNE_COLOUR_STANDARD', '''Auto''')
+GOPRO_PROTUNE_COLOUR_NEUTRAL = 1 # Neutral
+enums['GOPRO_PROTUNE_COLOUR'][1] = EnumEntry('GOPRO_PROTUNE_COLOUR_NEUTRAL', '''Neutral''')
+GOPRO_PROTUNE_COLOUR_ENUM_END = 2 # 
+enums['GOPRO_PROTUNE_COLOUR'][2] = EnumEntry('GOPRO_PROTUNE_COLOUR_ENUM_END', '''''')
+
+# GOPRO_PROTUNE_GAIN
+enums['GOPRO_PROTUNE_GAIN'] = {}
+GOPRO_PROTUNE_GAIN_400 = 0 # ISO 400
+enums['GOPRO_PROTUNE_GAIN'][0] = EnumEntry('GOPRO_PROTUNE_GAIN_400', '''ISO 400''')
+GOPRO_PROTUNE_GAIN_800 = 1 # ISO 800 (Only Hero 4)
+enums['GOPRO_PROTUNE_GAIN'][1] = EnumEntry('GOPRO_PROTUNE_GAIN_800', '''ISO 800 (Only Hero 4)''')
+GOPRO_PROTUNE_GAIN_1600 = 2 # ISO 1600
+enums['GOPRO_PROTUNE_GAIN'][2] = EnumEntry('GOPRO_PROTUNE_GAIN_1600', '''ISO 1600''')
+GOPRO_PROTUNE_GAIN_3200 = 3 # ISO 3200 (Only Hero 4)
+enums['GOPRO_PROTUNE_GAIN'][3] = EnumEntry('GOPRO_PROTUNE_GAIN_3200', '''ISO 3200 (Only Hero 4)''')
+GOPRO_PROTUNE_GAIN_6400 = 4 # ISO 6400
+enums['GOPRO_PROTUNE_GAIN'][4] = EnumEntry('GOPRO_PROTUNE_GAIN_6400', '''ISO 6400''')
+GOPRO_PROTUNE_GAIN_ENUM_END = 5 # 
+enums['GOPRO_PROTUNE_GAIN'][5] = EnumEntry('GOPRO_PROTUNE_GAIN_ENUM_END', '''''')
+
+# GOPRO_PROTUNE_SHARPNESS
+enums['GOPRO_PROTUNE_SHARPNESS'] = {}
+GOPRO_PROTUNE_SHARPNESS_LOW = 0 # Low Sharpness
+enums['GOPRO_PROTUNE_SHARPNESS'][0] = EnumEntry('GOPRO_PROTUNE_SHARPNESS_LOW', '''Low Sharpness''')
+GOPRO_PROTUNE_SHARPNESS_MEDIUM = 1 # Medium Sharpness
+enums['GOPRO_PROTUNE_SHARPNESS'][1] = EnumEntry('GOPRO_PROTUNE_SHARPNESS_MEDIUM', '''Medium Sharpness''')
+GOPRO_PROTUNE_SHARPNESS_HIGH = 2 # High Sharpness
+enums['GOPRO_PROTUNE_SHARPNESS'][2] = EnumEntry('GOPRO_PROTUNE_SHARPNESS_HIGH', '''High Sharpness''')
+GOPRO_PROTUNE_SHARPNESS_ENUM_END = 3 # 
+enums['GOPRO_PROTUNE_SHARPNESS'][3] = EnumEntry('GOPRO_PROTUNE_SHARPNESS_ENUM_END', '''''')
+
+# GOPRO_PROTUNE_EXPOSURE
+enums['GOPRO_PROTUNE_EXPOSURE'] = {}
+GOPRO_PROTUNE_EXPOSURE_NEG_5_0 = 0 # -5.0 EV (Hero 3+ Only)
+enums['GOPRO_PROTUNE_EXPOSURE'][0] = EnumEntry('GOPRO_PROTUNE_EXPOSURE_NEG_5_0', '''-5.0 EV (Hero 3+ Only)''')
+GOPRO_PROTUNE_EXPOSURE_NEG_4_5 = 1 # -4.5 EV (Hero 3+ Only)
+enums['GOPRO_PROTUNE_EXPOSURE'][1] = EnumEntry('GOPRO_PROTUNE_EXPOSURE_NEG_4_5', '''-4.5 EV (Hero 3+ Only)''')
+GOPRO_PROTUNE_EXPOSURE_NEG_4_0 = 2 # -4.0 EV (Hero 3+ Only)
+enums['GOPRO_PROTUNE_EXPOSURE'][2] = EnumEntry('GOPRO_PROTUNE_EXPOSURE_NEG_4_0', '''-4.0 EV (Hero 3+ Only)''')
+GOPRO_PROTUNE_EXPOSURE_NEG_3_5 = 3 # -3.5 EV (Hero 3+ Only)
+enums['GOPRO_PROTUNE_EXPOSURE'][3] = EnumEntry('GOPRO_PROTUNE_EXPOSURE_NEG_3_5', '''-3.5 EV (Hero 3+ Only)''')
+GOPRO_PROTUNE_EXPOSURE_NEG_3_0 = 4 # -3.0 EV (Hero 3+ Only)
+enums['GOPRO_PROTUNE_EXPOSURE'][4] = EnumEntry('GOPRO_PROTUNE_EXPOSURE_NEG_3_0', '''-3.0 EV (Hero 3+ Only)''')
+GOPRO_PROTUNE_EXPOSURE_NEG_2_5 = 5 # -2.5 EV (Hero 3+ Only)
+enums['GOPRO_PROTUNE_EXPOSURE'][5] = EnumEntry('GOPRO_PROTUNE_EXPOSURE_NEG_2_5', '''-2.5 EV (Hero 3+ Only)''')
+GOPRO_PROTUNE_EXPOSURE_NEG_2_0 = 6 # -2.0 EV
+enums['GOPRO_PROTUNE_EXPOSURE'][6] = EnumEntry('GOPRO_PROTUNE_EXPOSURE_NEG_2_0', '''-2.0 EV''')
+GOPRO_PROTUNE_EXPOSURE_NEG_1_5 = 7 # -1.5 EV
+enums['GOPRO_PROTUNE_EXPOSURE'][7] = EnumEntry('GOPRO_PROTUNE_EXPOSURE_NEG_1_5', '''-1.5 EV''')
+GOPRO_PROTUNE_EXPOSURE_NEG_1_0 = 8 # -1.0 EV
+enums['GOPRO_PROTUNE_EXPOSURE'][8] = EnumEntry('GOPRO_PROTUNE_EXPOSURE_NEG_1_0', '''-1.0 EV''')
+GOPRO_PROTUNE_EXPOSURE_NEG_0_5 = 9 # -0.5 EV
+enums['GOPRO_PROTUNE_EXPOSURE'][9] = EnumEntry('GOPRO_PROTUNE_EXPOSURE_NEG_0_5', '''-0.5 EV''')
+GOPRO_PROTUNE_EXPOSURE_ZERO = 10 # 0.0 EV
+enums['GOPRO_PROTUNE_EXPOSURE'][10] = EnumEntry('GOPRO_PROTUNE_EXPOSURE_ZERO', '''0.0 EV''')
+GOPRO_PROTUNE_EXPOSURE_POS_0_5 = 11 # +0.5 EV
+enums['GOPRO_PROTUNE_EXPOSURE'][11] = EnumEntry('GOPRO_PROTUNE_EXPOSURE_POS_0_5', '''+0.5 EV''')
+GOPRO_PROTUNE_EXPOSURE_POS_1_0 = 12 # +1.0 EV
+enums['GOPRO_PROTUNE_EXPOSURE'][12] = EnumEntry('GOPRO_PROTUNE_EXPOSURE_POS_1_0', '''+1.0 EV''')
+GOPRO_PROTUNE_EXPOSURE_POS_1_5 = 13 # +1.5 EV
+enums['GOPRO_PROTUNE_EXPOSURE'][13] = EnumEntry('GOPRO_PROTUNE_EXPOSURE_POS_1_5', '''+1.5 EV''')
+GOPRO_PROTUNE_EXPOSURE_POS_2_0 = 14 # +2.0 EV
+enums['GOPRO_PROTUNE_EXPOSURE'][14] = EnumEntry('GOPRO_PROTUNE_EXPOSURE_POS_2_0', '''+2.0 EV''')
+GOPRO_PROTUNE_EXPOSURE_POS_2_5 = 15 # +2.5 EV (Hero 3+ Only)
+enums['GOPRO_PROTUNE_EXPOSURE'][15] = EnumEntry('GOPRO_PROTUNE_EXPOSURE_POS_2_5', '''+2.5 EV (Hero 3+ Only)''')
+GOPRO_PROTUNE_EXPOSURE_POS_3_0 = 16 # +3.0 EV (Hero 3+ Only)
+enums['GOPRO_PROTUNE_EXPOSURE'][16] = EnumEntry('GOPRO_PROTUNE_EXPOSURE_POS_3_0', '''+3.0 EV (Hero 3+ Only)''')
+GOPRO_PROTUNE_EXPOSURE_POS_3_5 = 17 # +3.5 EV (Hero 3+ Only)
+enums['GOPRO_PROTUNE_EXPOSURE'][17] = EnumEntry('GOPRO_PROTUNE_EXPOSURE_POS_3_5', '''+3.5 EV (Hero 3+ Only)''')
+GOPRO_PROTUNE_EXPOSURE_POS_4_0 = 18 # +4.0 EV (Hero 3+ Only)
+enums['GOPRO_PROTUNE_EXPOSURE'][18] = EnumEntry('GOPRO_PROTUNE_EXPOSURE_POS_4_0', '''+4.0 EV (Hero 3+ Only)''')
+GOPRO_PROTUNE_EXPOSURE_POS_4_5 = 19 # +4.5 EV (Hero 3+ Only)
+enums['GOPRO_PROTUNE_EXPOSURE'][19] = EnumEntry('GOPRO_PROTUNE_EXPOSURE_POS_4_5', '''+4.5 EV (Hero 3+ Only)''')
+GOPRO_PROTUNE_EXPOSURE_POS_5_0 = 20 # +5.0 EV (Hero 3+ Only)
+enums['GOPRO_PROTUNE_EXPOSURE'][20] = EnumEntry('GOPRO_PROTUNE_EXPOSURE_POS_5_0', '''+5.0 EV (Hero 3+ Only)''')
+GOPRO_PROTUNE_EXPOSURE_ENUM_END = 21 # 
+enums['GOPRO_PROTUNE_EXPOSURE'][21] = EnumEntry('GOPRO_PROTUNE_EXPOSURE_ENUM_END', '''''')
+
+# GOPRO_CHARGING
+enums['GOPRO_CHARGING'] = {}
+GOPRO_CHARGING_DISABLED = 0 # Charging disabled
+enums['GOPRO_CHARGING'][0] = EnumEntry('GOPRO_CHARGING_DISABLED', '''Charging disabled''')
+GOPRO_CHARGING_ENABLED = 1 # Charging enabled
+enums['GOPRO_CHARGING'][1] = EnumEntry('GOPRO_CHARGING_ENABLED', '''Charging enabled''')
+GOPRO_CHARGING_ENUM_END = 2 # 
+enums['GOPRO_CHARGING'][2] = EnumEntry('GOPRO_CHARGING_ENUM_END', '''''')
+
+# GOPRO_MODEL
+enums['GOPRO_MODEL'] = {}
+GOPRO_MODEL_UNKNOWN = 0 # Unknown gopro model
+enums['GOPRO_MODEL'][0] = EnumEntry('GOPRO_MODEL_UNKNOWN', '''Unknown gopro model''')
+GOPRO_MODEL_HERO_3_PLUS_SILVER = 1 # Hero 3+ Silver (HeroBus not supported by GoPro)
+enums['GOPRO_MODEL'][1] = EnumEntry('GOPRO_MODEL_HERO_3_PLUS_SILVER', '''Hero 3+ Silver (HeroBus not supported by GoPro)''')
+GOPRO_MODEL_HERO_3_PLUS_BLACK = 2 # Hero 3+ Black
+enums['GOPRO_MODEL'][2] = EnumEntry('GOPRO_MODEL_HERO_3_PLUS_BLACK', '''Hero 3+ Black''')
+GOPRO_MODEL_HERO_4_SILVER = 3 # Hero 4 Silver
+enums['GOPRO_MODEL'][3] = EnumEntry('GOPRO_MODEL_HERO_4_SILVER', '''Hero 4 Silver''')
+GOPRO_MODEL_HERO_4_BLACK = 4 # Hero 4 Black
+enums['GOPRO_MODEL'][4] = EnumEntry('GOPRO_MODEL_HERO_4_BLACK', '''Hero 4 Black''')
+GOPRO_MODEL_ENUM_END = 5 # 
+enums['GOPRO_MODEL'][5] = EnumEntry('GOPRO_MODEL_ENUM_END', '''''')
+
+# GOPRO_BURST_RATE
+enums['GOPRO_BURST_RATE'] = {}
+GOPRO_BURST_RATE_3_IN_1_SECOND = 0 # 3 Shots / 1 Second
+enums['GOPRO_BURST_RATE'][0] = EnumEntry('GOPRO_BURST_RATE_3_IN_1_SECOND', '''3 Shots / 1 Second''')
+GOPRO_BURST_RATE_5_IN_1_SECOND = 1 # 5 Shots / 1 Second
+enums['GOPRO_BURST_RATE'][1] = EnumEntry('GOPRO_BURST_RATE_5_IN_1_SECOND', '''5 Shots / 1 Second''')
+GOPRO_BURST_RATE_10_IN_1_SECOND = 2 # 10 Shots / 1 Second
+enums['GOPRO_BURST_RATE'][2] = EnumEntry('GOPRO_BURST_RATE_10_IN_1_SECOND', '''10 Shots / 1 Second''')
+GOPRO_BURST_RATE_10_IN_2_SECOND = 3 # 10 Shots / 2 Second
+enums['GOPRO_BURST_RATE'][3] = EnumEntry('GOPRO_BURST_RATE_10_IN_2_SECOND', '''10 Shots / 2 Second''')
+GOPRO_BURST_RATE_10_IN_3_SECOND = 4 # 10 Shots / 3 Second (Hero 4 Only)
+enums['GOPRO_BURST_RATE'][4] = EnumEntry('GOPRO_BURST_RATE_10_IN_3_SECOND', '''10 Shots / 3 Second (Hero 4 Only)''')
+GOPRO_BURST_RATE_30_IN_1_SECOND = 5 # 30 Shots / 1 Second
+enums['GOPRO_BURST_RATE'][5] = EnumEntry('GOPRO_BURST_RATE_30_IN_1_SECOND', '''30 Shots / 1 Second''')
+GOPRO_BURST_RATE_30_IN_2_SECOND = 6 # 30 Shots / 2 Second
+enums['GOPRO_BURST_RATE'][6] = EnumEntry('GOPRO_BURST_RATE_30_IN_2_SECOND', '''30 Shots / 2 Second''')
+GOPRO_BURST_RATE_30_IN_3_SECOND = 7 # 30 Shots / 3 Second
+enums['GOPRO_BURST_RATE'][7] = EnumEntry('GOPRO_BURST_RATE_30_IN_3_SECOND', '''30 Shots / 3 Second''')
+GOPRO_BURST_RATE_30_IN_6_SECOND = 8 # 30 Shots / 6 Second
+enums['GOPRO_BURST_RATE'][8] = EnumEntry('GOPRO_BURST_RATE_30_IN_6_SECOND', '''30 Shots / 6 Second''')
+GOPRO_BURST_RATE_ENUM_END = 9 # 
+enums['GOPRO_BURST_RATE'][9] = EnumEntry('GOPRO_BURST_RATE_ENUM_END', '''''')
 
 # LED_CONTROL_PATTERN
 enums['LED_CONTROL_PATTERN'] = {}
@@ -1100,6 +1703,21 @@ enums['EKF_STATUS_FLAGS'][512] = EnumEntry('EKF_PRED_POS_HORIZ_ABS', '''set if E
 EKF_STATUS_FLAGS_ENUM_END = 513 # 
 enums['EKF_STATUS_FLAGS'][513] = EnumEntry('EKF_STATUS_FLAGS_ENUM_END', '''''')
 
+# PID_TUNING_AXIS
+enums['PID_TUNING_AXIS'] = {}
+PID_TUNING_ROLL = 1 # 
+enums['PID_TUNING_AXIS'][1] = EnumEntry('PID_TUNING_ROLL', '''''')
+PID_TUNING_PITCH = 2 # 
+enums['PID_TUNING_AXIS'][2] = EnumEntry('PID_TUNING_PITCH', '''''')
+PID_TUNING_YAW = 3 # 
+enums['PID_TUNING_AXIS'][3] = EnumEntry('PID_TUNING_YAW', '''''')
+PID_TUNING_ACCZ = 4 # 
+enums['PID_TUNING_AXIS'][4] = EnumEntry('PID_TUNING_ACCZ', '''''')
+PID_TUNING_STEER = 5 # 
+enums['PID_TUNING_AXIS'][5] = EnumEntry('PID_TUNING_STEER', '''''')
+PID_TUNING_AXIS_ENUM_END = 6 # 
+enums['PID_TUNING_AXIS'][6] = EnumEntry('PID_TUNING_AXIS_ENUM_END', '''''')
+
 # MAG_CAL_STATUS
 enums['MAG_CAL_STATUS'] = {}
 MAG_CAL_NOT_STARTED = 0 # 
@@ -1134,21 +1752,6 @@ MAV_REMOTE_LOG_DATA_BLOCK_ACK = 1 # This block has been received
 enums['MAV_REMOTE_LOG_DATA_BLOCK_STATUSES'][1] = EnumEntry('MAV_REMOTE_LOG_DATA_BLOCK_ACK', '''This block has been received''')
 MAV_REMOTE_LOG_DATA_BLOCK_STATUSES_ENUM_END = 2 # 
 enums['MAV_REMOTE_LOG_DATA_BLOCK_STATUSES'][2] = EnumEntry('MAV_REMOTE_LOG_DATA_BLOCK_STATUSES_ENUM_END', '''''')
-
-# PID_TUNING_AXIS
-enums['PID_TUNING_AXIS'] = {}
-PID_TUNING_ROLL = 1 # 
-enums['PID_TUNING_AXIS'][1] = EnumEntry('PID_TUNING_ROLL', '''''')
-PID_TUNING_PITCH = 2 # 
-enums['PID_TUNING_AXIS'][2] = EnumEntry('PID_TUNING_PITCH', '''''')
-PID_TUNING_YAW = 3 # 
-enums['PID_TUNING_AXIS'][3] = EnumEntry('PID_TUNING_YAW', '''''')
-PID_TUNING_ACCZ = 4 # 
-enums['PID_TUNING_AXIS'][4] = EnumEntry('PID_TUNING_ACCZ', '''''')
-PID_TUNING_STEER = 5 # 
-enums['PID_TUNING_AXIS'][5] = EnumEntry('PID_TUNING_STEER', '''''')
-PID_TUNING_AXIS_ENUM_END = 6 # 
-enums['PID_TUNING_AXIS'][6] = EnumEntry('PID_TUNING_AXIS_ENUM_END', '''''')
 
 # MAV_AUTOPILOT
 enums['MAV_AUTOPILOT'] = {}
@@ -1434,6 +2037,11 @@ MAV_COMP_ID_LOG = 155 #
 enums['MAV_COMPONENT'][155] = EnumEntry('MAV_COMP_ID_LOG', '''''')
 MAV_COMP_ID_ADSB = 156 # 
 enums['MAV_COMPONENT'][156] = EnumEntry('MAV_COMP_ID_ADSB', '''''')
+MAV_COMP_ID_OSD = 157 # On Screen Display (OSD) devices for video links
+enums['MAV_COMPONENT'][157] = EnumEntry('MAV_COMP_ID_OSD', '''On Screen Display (OSD) devices for video links''')
+MAV_COMP_ID_PERIPHERAL = 158 # Generic autopilot peripheral component ID. Meant for devices that do
+                        # not implement the parameter sub-protocol
+enums['MAV_COMPONENT'][158] = EnumEntry('MAV_COMP_ID_PERIPHERAL', '''Generic autopilot peripheral component ID. Meant for devices that do not implement the parameter sub-protocol''')
 MAV_COMP_ID_MAPPER = 180 # 
 enums['MAV_COMPONENT'][180] = EnumEntry('MAV_COMP_ID_MAPPER', '''''')
 MAV_COMP_ID_MISSIONPLANNER = 190 # 
@@ -1505,8 +2113,10 @@ MAV_SYS_STATUS_AHRS = 2097152 # 0x200000 AHRS subsystem health
 enums['MAV_SYS_STATUS_SENSOR'][2097152] = EnumEntry('MAV_SYS_STATUS_AHRS', '''0x200000 AHRS subsystem health''')
 MAV_SYS_STATUS_TERRAIN = 4194304 # 0x400000 Terrain subsystem health
 enums['MAV_SYS_STATUS_SENSOR'][4194304] = EnumEntry('MAV_SYS_STATUS_TERRAIN', '''0x400000 Terrain subsystem health''')
-MAV_SYS_STATUS_SENSOR_ENUM_END = 4194305 # 
-enums['MAV_SYS_STATUS_SENSOR'][4194305] = EnumEntry('MAV_SYS_STATUS_SENSOR_ENUM_END', '''''')
+MAV_SYS_STATUS_REVERSE_MOTOR = 8388608 # 0x800000 Motors are reversed
+enums['MAV_SYS_STATUS_SENSOR'][8388608] = EnumEntry('MAV_SYS_STATUS_REVERSE_MOTOR', '''0x800000 Motors are reversed''')
+MAV_SYS_STATUS_SENSOR_ENUM_END = 8388609 # 
+enums['MAV_SYS_STATUS_SENSOR'][8388609] = EnumEntry('MAV_SYS_STATUS_SENSOR_ENUM_END', '''''')
 
 # MAV_FRAME
 enums['MAV_FRAME'] = {}
@@ -1967,8 +2577,8 @@ MAV_PROTOCOL_CAPABILITY_COMMAND_INT = 8 # Autopilot supports COMMAND_INT scaled 
 enums['MAV_PROTOCOL_CAPABILITY'][8] = EnumEntry('MAV_PROTOCOL_CAPABILITY_COMMAND_INT', '''Autopilot supports COMMAND_INT scaled integer message type.''')
 MAV_PROTOCOL_CAPABILITY_PARAM_UNION = 16 # Autopilot supports the new param union message type.
 enums['MAV_PROTOCOL_CAPABILITY'][16] = EnumEntry('MAV_PROTOCOL_CAPABILITY_PARAM_UNION', '''Autopilot supports the new param union message type.''')
-MAV_PROTOCOL_CAPABILITY_FTP = 32 # Autopilot supports the new param union message type.
-enums['MAV_PROTOCOL_CAPABILITY'][32] = EnumEntry('MAV_PROTOCOL_CAPABILITY_FTP', '''Autopilot supports the new param union message type.''')
+MAV_PROTOCOL_CAPABILITY_FTP = 32 # Autopilot supports the new FILE_TRANSFER_PROTOCOL message type.
+enums['MAV_PROTOCOL_CAPABILITY'][32] = EnumEntry('MAV_PROTOCOL_CAPABILITY_FTP', '''Autopilot supports the new FILE_TRANSFER_PROTOCOL message type.''')
 MAV_PROTOCOL_CAPABILITY_SET_ATTITUDE_TARGET = 64 # Autopilot supports commanding attitude offboard.
 enums['MAV_PROTOCOL_CAPABILITY'][64] = EnumEntry('MAV_PROTOCOL_CAPABILITY_SET_ATTITUDE_TARGET', '''Autopilot supports commanding attitude offboard.''')
 MAV_PROTOCOL_CAPABILITY_SET_POSITION_TARGET_LOCAL_NED = 128 # Autopilot supports commanding position and velocity targets in local
@@ -2007,10 +2617,10 @@ enums['MAV_ESTIMATOR_TYPE'][6] = EnumEntry('MAV_ESTIMATOR_TYPE_ENUM_END', ''''''
 enums['MAV_BATTERY_TYPE'] = {}
 MAV_BATTERY_TYPE_UNKNOWN = 0 # Not specified.
 enums['MAV_BATTERY_TYPE'][0] = EnumEntry('MAV_BATTERY_TYPE_UNKNOWN', '''Not specified.''')
-MAV_BATTERY_TYPE_LIPO = 1 # Lithium polymere battery
-enums['MAV_BATTERY_TYPE'][1] = EnumEntry('MAV_BATTERY_TYPE_LIPO', '''Lithium polymere battery''')
-MAV_BATTERY_TYPE_LIFE = 2 # Lithium ferrite battery
-enums['MAV_BATTERY_TYPE'][2] = EnumEntry('MAV_BATTERY_TYPE_LIFE', '''Lithium ferrite battery''')
+MAV_BATTERY_TYPE_LIPO = 1 # Lithium polymer battery
+enums['MAV_BATTERY_TYPE'][1] = EnumEntry('MAV_BATTERY_TYPE_LIPO', '''Lithium polymer battery''')
+MAV_BATTERY_TYPE_LIFE = 2 # Lithium-iron-phosphate battery
+enums['MAV_BATTERY_TYPE'][2] = EnumEntry('MAV_BATTERY_TYPE_LIFE', '''Lithium-iron-phosphate battery''')
 MAV_BATTERY_TYPE_LION = 3 # Lithium-ION battery
 enums['MAV_BATTERY_TYPE'][3] = EnumEntry('MAV_BATTERY_TYPE_LION', '''Lithium-ION battery''')
 MAV_BATTERY_TYPE_NIMH = 4 # Nickel metal hydride battery
@@ -2020,8 +2630,8 @@ enums['MAV_BATTERY_TYPE'][5] = EnumEntry('MAV_BATTERY_TYPE_ENUM_END', '''''')
 
 # MAV_BATTERY_FUNCTION
 enums['MAV_BATTERY_FUNCTION'] = {}
-MAV_BATTERY_FUNCTION_UNKNOWN = 0 # Lithium polymere battery
-enums['MAV_BATTERY_FUNCTION'][0] = EnumEntry('MAV_BATTERY_FUNCTION_UNKNOWN', '''Lithium polymere battery''')
+MAV_BATTERY_FUNCTION_UNKNOWN = 0 # Battery function is unknown
+enums['MAV_BATTERY_FUNCTION'][0] = EnumEntry('MAV_BATTERY_FUNCTION_UNKNOWN', '''Battery function is unknown''')
 MAV_BATTERY_FUNCTION_ALL = 1 # Battery supports all flight systems
 enums['MAV_BATTERY_FUNCTION'][1] = EnumEntry('MAV_BATTERY_FUNCTION_ALL', '''Battery supports all flight systems''')
 MAV_BATTERY_FUNCTION_PROPULSION = 2 # Battery for the propulsion system
@@ -2176,19 +2786,12 @@ MAVLINK_MSG_ID_EKF_STATUS_REPORT = 193
 MAVLINK_MSG_ID_PID_TUNING = 194
 MAVLINK_MSG_ID_GIMBAL_REPORT = 200
 MAVLINK_MSG_ID_GIMBAL_CONTROL = 201
-MAVLINK_MSG_ID_GIMBAL_RESET = 202
-MAVLINK_MSG_ID_GIMBAL_AXIS_CALIBRATION_PROGRESS = 203
-MAVLINK_MSG_ID_GIMBAL_SET_HOME_OFFSETS = 204
-MAVLINK_MSG_ID_GIMBAL_HOME_OFFSET_CALIBRATION_RESULT = 205
-MAVLINK_MSG_ID_GIMBAL_SET_FACTORY_PARAMETERS = 206
-MAVLINK_MSG_ID_GIMBAL_FACTORY_PARAMETERS_LOADED = 207
-MAVLINK_MSG_ID_GIMBAL_ERASE_FIRMWARE_AND_CONFIG = 208
-MAVLINK_MSG_ID_GIMBAL_PERFORM_FACTORY_TESTS = 209
-MAVLINK_MSG_ID_GIMBAL_REPORT_FACTORY_TESTS_PROGRESS = 210
-MAVLINK_MSG_ID_GOPRO_POWER_ON = 215
-MAVLINK_MSG_ID_GOPRO_POWER_OFF = 216
-MAVLINK_MSG_ID_GOPRO_COMMAND = 217
-MAVLINK_MSG_ID_GOPRO_RESPONSE = 218
+MAVLINK_MSG_ID_GIMBAL_TORQUE_CMD_REPORT = 214
+MAVLINK_MSG_ID_GOPRO_HEARTBEAT = 215
+MAVLINK_MSG_ID_GOPRO_GET_REQUEST = 216
+MAVLINK_MSG_ID_GOPRO_GET_RESPONSE = 217
+MAVLINK_MSG_ID_GOPRO_SET_REQUEST = 218
+MAVLINK_MSG_ID_GOPRO_SET_RESPONSE = 219
 MAVLINK_MSG_ID_RPM = 226
 MAVLINK_MSG_ID_HEARTBEAT = 0
 MAVLINK_MSG_ID_SYS_STATUS = 1
@@ -2300,6 +2903,7 @@ MAVLINK_MSG_ID_ACTUATOR_CONTROL_TARGET = 140
 MAVLINK_MSG_ID_ALTITUDE = 141
 MAVLINK_MSG_ID_RESOURCE_REQUEST = 142
 MAVLINK_MSG_ID_SCALED_PRESSURE3 = 143
+MAVLINK_MSG_ID_FOLLOW_TARGET = 144
 MAVLINK_MSG_ID_CONTROL_SYSTEM_STATE = 146
 MAVLINK_MSG_ID_BATTERY_STATUS = 147
 MAVLINK_MSG_ID_AUTOPILOT_VERSION = 148
@@ -2320,8 +2924,8 @@ MAVLINK_MSG_ID_DEBUG = 254
 
 class MAVLink_sensor_offsets_message(MAVLink_message):
         '''
-        Offsets and calibrations values for hardware         sensors.
-        This makes it easier to debug the calibration process.
+        Offsets and calibrations values for hardware sensors. This
+        makes it easier to debug the calibration process.
         '''
         id = MAVLINK_MSG_ID_SENSOR_OFFSETS
         name = 'SENSOR_OFFSETS'
@@ -2584,8 +3188,8 @@ class MAVLink_mount_status_message(MAVLink_message):
 
 class MAVLink_fence_point_message(MAVLink_message):
         '''
-        A fence point. Used to set a point when from               GCS
-        -> MAV. Also used to return a point from MAV -> GCS
+        A fence point. Used to set a point when from GCS -> MAV. Also
+        used to return a point from MAV -> GCS
         '''
         id = MAVLINK_MSG_ID_FENCE_POINT
         name = 'FENCE_POINT'
@@ -2638,8 +3242,8 @@ class MAVLink_fence_fetch_point_message(MAVLink_message):
 
 class MAVLink_fence_status_message(MAVLink_message):
         '''
-        Status of geo-fencing. Sent in extended             status
-        stream when fencing enabled
+        Status of geo-fencing. Sent in extended status stream when
+        fencing enabled
         '''
         id = MAVLINK_MSG_ID_FENCE_STATUS
         name = 'FENCE_STATUS'
@@ -2780,8 +3384,8 @@ class MAVLink_radio_message(MAVLink_message):
 
 class MAVLink_limits_status_message(MAVLink_message):
         '''
-        Status of AP_Limits. Sent in extended             status
-        stream when AP_Limits is enabled
+        Status of AP_Limits. Sent in extended status stream when
+        AP_Limits is enabled
         '''
         id = MAVLINK_MSG_ID_LIMITS_STATUS
         name = 'LIMITS_STATUS'
@@ -3464,7 +4068,7 @@ class MAVLink_pid_tuning_message(MAVLink_message):
 
 class MAVLink_gimbal_report_message(MAVLink_message):
         '''
-        3 axis gimbal measurements
+        3 axis gimbal mesuraments
         '''
         id = MAVLINK_MSG_ID_GIMBAL_REPORT
         name = 'GIMBAL_REPORT'
@@ -3523,366 +4127,157 @@ class MAVLink_gimbal_control_message(MAVLink_message):
         def pack(self, mav):
                 return MAVLink_message.pack(self, mav, 205, struct.pack('<fffBB', self.demanded_rate_x, self.demanded_rate_y, self.demanded_rate_z, self.target_system, self.target_component))
 
-class MAVLink_gimbal_reset_message(MAVLink_message):
+class MAVLink_gimbal_torque_cmd_report_message(MAVLink_message):
         '''
-        Causes the gimbal to reset and boot as if it was just powered
-        on
+        100 Hz gimbal torque command telemetry
         '''
-        id = MAVLINK_MSG_ID_GIMBAL_RESET
-        name = 'GIMBAL_RESET'
-        fieldnames = ['target_system', 'target_component']
-        ordered_fieldnames = [ 'target_system', 'target_component' ]
-        format = '<BB'
-        native_format = bytearray('<BB', 'ascii')
-        orders = [0, 1]
-        lengths = [1, 1]
-        array_lengths = [0, 0]
-        crc_extra = 94
+        id = MAVLINK_MSG_ID_GIMBAL_TORQUE_CMD_REPORT
+        name = 'GIMBAL_TORQUE_CMD_REPORT'
+        fieldnames = ['target_system', 'target_component', 'rl_torque_cmd', 'el_torque_cmd', 'az_torque_cmd']
+        ordered_fieldnames = [ 'rl_torque_cmd', 'el_torque_cmd', 'az_torque_cmd', 'target_system', 'target_component' ]
+        format = '<hhhBB'
+        native_format = bytearray('<hhhBB', 'ascii')
+        orders = [3, 4, 0, 1, 2]
+        lengths = [1, 1, 1, 1, 1]
+        array_lengths = [0, 0, 0, 0, 0]
+        crc_extra = 69
 
-        def __init__(self, target_system, target_component):
-                MAVLink_message.__init__(self, MAVLink_gimbal_reset_message.id, MAVLink_gimbal_reset_message.name)
-                self._fieldnames = MAVLink_gimbal_reset_message.fieldnames
+        def __init__(self, target_system, target_component, rl_torque_cmd, el_torque_cmd, az_torque_cmd):
+                MAVLink_message.__init__(self, MAVLink_gimbal_torque_cmd_report_message.id, MAVLink_gimbal_torque_cmd_report_message.name)
+                self._fieldnames = MAVLink_gimbal_torque_cmd_report_message.fieldnames
                 self.target_system = target_system
                 self.target_component = target_component
+                self.rl_torque_cmd = rl_torque_cmd
+                self.el_torque_cmd = el_torque_cmd
+                self.az_torque_cmd = az_torque_cmd
 
         def pack(self, mav):
-                return MAVLink_message.pack(self, mav, 94, struct.pack('<BB', self.target_system, self.target_component))
+                return MAVLink_message.pack(self, mav, 69, struct.pack('<hhhBB', self.rl_torque_cmd, self.el_torque_cmd, self.az_torque_cmd, self.target_system, self.target_component))
 
-class MAVLink_gimbal_axis_calibration_progress_message(MAVLink_message):
+class MAVLink_gopro_heartbeat_message(MAVLink_message):
         '''
-        Reports progress and success or failure of gimbal axis
-        calibration procedure
+        Heartbeat from a HeroBus attached GoPro
         '''
-        id = MAVLINK_MSG_ID_GIMBAL_AXIS_CALIBRATION_PROGRESS
-        name = 'GIMBAL_AXIS_CALIBRATION_PROGRESS'
-        fieldnames = ['calibration_axis', 'calibration_progress', 'calibration_status']
-        ordered_fieldnames = [ 'calibration_axis', 'calibration_progress', 'calibration_status' ]
+        id = MAVLINK_MSG_ID_GOPRO_HEARTBEAT
+        name = 'GOPRO_HEARTBEAT'
+        fieldnames = ['status', 'capture_mode', 'flags']
+        ordered_fieldnames = [ 'status', 'capture_mode', 'flags' ]
         format = '<BBB'
         native_format = bytearray('<BBB', 'ascii')
         orders = [0, 1, 2]
         lengths = [1, 1, 1]
         array_lengths = [0, 0, 0]
-        crc_extra = 128
+        crc_extra = 101
 
-        def __init__(self, calibration_axis, calibration_progress, calibration_status):
-                MAVLink_message.__init__(self, MAVLink_gimbal_axis_calibration_progress_message.id, MAVLink_gimbal_axis_calibration_progress_message.name)
-                self._fieldnames = MAVLink_gimbal_axis_calibration_progress_message.fieldnames
-                self.calibration_axis = calibration_axis
-                self.calibration_progress = calibration_progress
-                self.calibration_status = calibration_status
-
-        def pack(self, mav):
-                return MAVLink_message.pack(self, mav, 128, struct.pack('<BBB', self.calibration_axis, self.calibration_progress, self.calibration_status))
-
-class MAVLink_gimbal_set_home_offsets_message(MAVLink_message):
-        '''
-        Instructs the gimbal to set its current position as its new
-        home position.  Will primarily be used for factory calibration
-        '''
-        id = MAVLINK_MSG_ID_GIMBAL_SET_HOME_OFFSETS
-        name = 'GIMBAL_SET_HOME_OFFSETS'
-        fieldnames = ['target_system', 'target_component']
-        ordered_fieldnames = [ 'target_system', 'target_component' ]
-        format = '<BB'
-        native_format = bytearray('<BB', 'ascii')
-        orders = [0, 1]
-        lengths = [1, 1]
-        array_lengths = [0, 0]
-        crc_extra = 54
-
-        def __init__(self, target_system, target_component):
-                MAVLink_message.__init__(self, MAVLink_gimbal_set_home_offsets_message.id, MAVLink_gimbal_set_home_offsets_message.name)
-                self._fieldnames = MAVLink_gimbal_set_home_offsets_message.fieldnames
-                self.target_system = target_system
-                self.target_component = target_component
+        def __init__(self, status, capture_mode, flags):
+                MAVLink_message.__init__(self, MAVLink_gopro_heartbeat_message.id, MAVLink_gopro_heartbeat_message.name)
+                self._fieldnames = MAVLink_gopro_heartbeat_message.fieldnames
+                self.status = status
+                self.capture_mode = capture_mode
+                self.flags = flags
 
         def pack(self, mav):
-                return MAVLink_message.pack(self, mav, 54, struct.pack('<BB', self.target_system, self.target_component))
+                return MAVLink_message.pack(self, mav, 101, struct.pack('<BBB', self.status, self.capture_mode, self.flags))
 
-class MAVLink_gimbal_home_offset_calibration_result_message(MAVLink_message):
+class MAVLink_gopro_get_request_message(MAVLink_message):
         '''
-        Sent by the gimbal after it receives a SET_HOME_OFFSETS
-        message to indicate the result of the home offset calibration
+        Request a GOPRO_COMMAND response from the GoPro
         '''
-        id = MAVLINK_MSG_ID_GIMBAL_HOME_OFFSET_CALIBRATION_RESULT
-        name = 'GIMBAL_HOME_OFFSET_CALIBRATION_RESULT'
-        fieldnames = ['calibration_result']
-        ordered_fieldnames = [ 'calibration_result' ]
-        format = '<B'
-        native_format = bytearray('<B', 'ascii')
-        orders = [0]
-        lengths = [1]
-        array_lengths = [0]
-        crc_extra = 63
-
-        def __init__(self, calibration_result):
-                MAVLink_message.__init__(self, MAVLink_gimbal_home_offset_calibration_result_message.id, MAVLink_gimbal_home_offset_calibration_result_message.name)
-                self._fieldnames = MAVLink_gimbal_home_offset_calibration_result_message.fieldnames
-                self.calibration_result = calibration_result
-
-        def pack(self, mav):
-                return MAVLink_message.pack(self, mav, 63, struct.pack('<B', self.calibration_result))
-
-class MAVLink_gimbal_set_factory_parameters_message(MAVLink_message):
-        '''
-        Set factory configuration parameters (such as assembly date
-        and time, and serial number).  This is only intended to be
-        used             during manufacture, not by end users, so it
-        is protected by a simple checksum of sorts (this won't stop
-        anybody determined,             it's mostly just to keep the
-        average user from trying to modify these values.  This will
-        need to be revisited if that isn't             adequate.
-        '''
-        id = MAVLINK_MSG_ID_GIMBAL_SET_FACTORY_PARAMETERS
-        name = 'GIMBAL_SET_FACTORY_PARAMETERS'
-        fieldnames = ['target_system', 'target_component', 'magic_1', 'magic_2', 'magic_3', 'assembly_year', 'assembly_month', 'assembly_day', 'assembly_hour', 'assembly_minute', 'assembly_second', 'serial_number_pt_1', 'serial_number_pt_2', 'serial_number_pt_3']
-        ordered_fieldnames = [ 'magic_1', 'magic_2', 'magic_3', 'serial_number_pt_1', 'serial_number_pt_2', 'serial_number_pt_3', 'assembly_year', 'target_system', 'target_component', 'assembly_month', 'assembly_day', 'assembly_hour', 'assembly_minute', 'assembly_second' ]
-        format = '<IIIIIIHBBBBBBB'
-        native_format = bytearray('<IIIIIIHBBBBBBB', 'ascii')
-        orders = [7, 8, 0, 1, 2, 6, 9, 10, 11, 12, 13, 3, 4, 5]
-        lengths = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-        array_lengths = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-        crc_extra = 112
-
-        def __init__(self, target_system, target_component, magic_1, magic_2, magic_3, assembly_year, assembly_month, assembly_day, assembly_hour, assembly_minute, assembly_second, serial_number_pt_1, serial_number_pt_2, serial_number_pt_3):
-                MAVLink_message.__init__(self, MAVLink_gimbal_set_factory_parameters_message.id, MAVLink_gimbal_set_factory_parameters_message.name)
-                self._fieldnames = MAVLink_gimbal_set_factory_parameters_message.fieldnames
-                self.target_system = target_system
-                self.target_component = target_component
-                self.magic_1 = magic_1
-                self.magic_2 = magic_2
-                self.magic_3 = magic_3
-                self.assembly_year = assembly_year
-                self.assembly_month = assembly_month
-                self.assembly_day = assembly_day
-                self.assembly_hour = assembly_hour
-                self.assembly_minute = assembly_minute
-                self.assembly_second = assembly_second
-                self.serial_number_pt_1 = serial_number_pt_1
-                self.serial_number_pt_2 = serial_number_pt_2
-                self.serial_number_pt_3 = serial_number_pt_3
-
-        def pack(self, mav):
-                return MAVLink_message.pack(self, mav, 112, struct.pack('<IIIIIIHBBBBBBB', self.magic_1, self.magic_2, self.magic_3, self.serial_number_pt_1, self.serial_number_pt_2, self.serial_number_pt_3, self.assembly_year, self.target_system, self.target_component, self.assembly_month, self.assembly_day, self.assembly_hour, self.assembly_minute, self.assembly_second))
-
-class MAVLink_gimbal_factory_parameters_loaded_message(MAVLink_message):
-        '''
-        Sent by the gimbal after the factory parameters are
-        successfully loaded, to inform the factory software that the
-        load is complete
-        '''
-        id = MAVLINK_MSG_ID_GIMBAL_FACTORY_PARAMETERS_LOADED
-        name = 'GIMBAL_FACTORY_PARAMETERS_LOADED'
-        fieldnames = ['dummy']
-        ordered_fieldnames = [ 'dummy' ]
-        format = '<B'
-        native_format = bytearray('<B', 'ascii')
-        orders = [0]
-        lengths = [1]
-        array_lengths = [0]
-        crc_extra = 201
-
-        def __init__(self, dummy):
-                MAVLink_message.__init__(self, MAVLink_gimbal_factory_parameters_loaded_message.id, MAVLink_gimbal_factory_parameters_loaded_message.name)
-                self._fieldnames = MAVLink_gimbal_factory_parameters_loaded_message.fieldnames
-                self.dummy = dummy
-
-        def pack(self, mav):
-                return MAVLink_message.pack(self, mav, 201, struct.pack('<B', self.dummy))
-
-class MAVLink_gimbal_erase_firmware_and_config_message(MAVLink_message):
-        '''
-        Commands the gimbal to erase its firmware image and flash
-        configuration, leaving only the bootloader.  The gimbal will
-        then reboot into the bootloader,             ready for the
-        load of a new application firmware image.  Erasing the flash
-        configuration will cause the gimbal to re-perform axis
-        calibration when a             new firmware image is loaded,
-        and will cause all tuning parameters to return to their
-        factory defaults.  WARNING: sending this command will render a
-        gimbal inoperable until a new firmware image is loaded onto
-        it.  For this reason, a particular "knock" value must be sent
-        for the command to take effect.             Use this command
-        at your own risk
-        '''
-        id = MAVLINK_MSG_ID_GIMBAL_ERASE_FIRMWARE_AND_CONFIG
-        name = 'GIMBAL_ERASE_FIRMWARE_AND_CONFIG'
-        fieldnames = ['target_system', 'target_component', 'knock']
-        ordered_fieldnames = [ 'knock', 'target_system', 'target_component' ]
-        format = '<IBB'
-        native_format = bytearray('<IBB', 'ascii')
-        orders = [1, 2, 0]
+        id = MAVLINK_MSG_ID_GOPRO_GET_REQUEST
+        name = 'GOPRO_GET_REQUEST'
+        fieldnames = ['target_system', 'target_component', 'cmd_id']
+        ordered_fieldnames = [ 'target_system', 'target_component', 'cmd_id' ]
+        format = '<BBB'
+        native_format = bytearray('<BBB', 'ascii')
+        orders = [0, 1, 2]
         lengths = [1, 1, 1]
         array_lengths = [0, 0, 0]
-        crc_extra = 221
+        crc_extra = 50
 
-        def __init__(self, target_system, target_component, knock):
-                MAVLink_message.__init__(self, MAVLink_gimbal_erase_firmware_and_config_message.id, MAVLink_gimbal_erase_firmware_and_config_message.name)
-                self._fieldnames = MAVLink_gimbal_erase_firmware_and_config_message.fieldnames
+        def __init__(self, target_system, target_component, cmd_id):
+                MAVLink_message.__init__(self, MAVLink_gopro_get_request_message.id, MAVLink_gopro_get_request_message.name)
+                self._fieldnames = MAVLink_gopro_get_request_message.fieldnames
                 self.target_system = target_system
                 self.target_component = target_component
-                self.knock = knock
+                self.cmd_id = cmd_id
 
         def pack(self, mav):
-                return MAVLink_message.pack(self, mav, 221, struct.pack('<IBB', self.knock, self.target_system, self.target_component))
+                return MAVLink_message.pack(self, mav, 50, struct.pack('<BBB', self.target_system, self.target_component, self.cmd_id))
 
-class MAVLink_gimbal_perform_factory_tests_message(MAVLink_message):
+class MAVLink_gopro_get_response_message(MAVLink_message):
         '''
-        Command the gimbal to perform a series of factory tests.
-        Should not be needed by end users
+        Response from a GOPRO_COMMAND get request
         '''
-        id = MAVLINK_MSG_ID_GIMBAL_PERFORM_FACTORY_TESTS
-        name = 'GIMBAL_PERFORM_FACTORY_TESTS'
-        fieldnames = ['target_system', 'target_component']
-        ordered_fieldnames = [ 'target_system', 'target_component' ]
-        format = '<BB'
-        native_format = bytearray('<BB', 'ascii')
-        orders = [0, 1]
-        lengths = [1, 1]
-        array_lengths = [0, 0]
-        crc_extra = 226
+        id = MAVLINK_MSG_ID_GOPRO_GET_RESPONSE
+        name = 'GOPRO_GET_RESPONSE'
+        fieldnames = ['cmd_id', 'status', 'value']
+        ordered_fieldnames = [ 'cmd_id', 'status', 'value' ]
+        format = '<BB4B'
+        native_format = bytearray('<BBB', 'ascii')
+        orders = [0, 1, 2]
+        lengths = [1, 1, 4]
+        array_lengths = [0, 0, 4]
+        crc_extra = 202
 
-        def __init__(self, target_system, target_component):
-                MAVLink_message.__init__(self, MAVLink_gimbal_perform_factory_tests_message.id, MAVLink_gimbal_perform_factory_tests_message.name)
-                self._fieldnames = MAVLink_gimbal_perform_factory_tests_message.fieldnames
-                self.target_system = target_system
-                self.target_component = target_component
+        def __init__(self, cmd_id, status, value):
+                MAVLink_message.__init__(self, MAVLink_gopro_get_response_message.id, MAVLink_gopro_get_response_message.name)
+                self._fieldnames = MAVLink_gopro_get_response_message.fieldnames
+                self.cmd_id = cmd_id
+                self.status = status
+                self.value = value
 
         def pack(self, mav):
-                return MAVLink_message.pack(self, mav, 226, struct.pack('<BB', self.target_system, self.target_component))
+                return MAVLink_message.pack(self, mav, 202, struct.pack('<BB4B', self.cmd_id, self.status, self.value[0], self.value[1], self.value[2], self.value[3]))
 
-class MAVLink_gimbal_report_factory_tests_progress_message(MAVLink_message):
+class MAVLink_gopro_set_request_message(MAVLink_message):
         '''
-        Reports the current status of a section of a running factory
-        test
+        Request to set a GOPRO_COMMAND with a desired
         '''
-        id = MAVLINK_MSG_ID_GIMBAL_REPORT_FACTORY_TESTS_PROGRESS
-        name = 'GIMBAL_REPORT_FACTORY_TESTS_PROGRESS'
-        fieldnames = ['test', 'test_section', 'test_section_progress', 'test_status']
-        ordered_fieldnames = [ 'test', 'test_section', 'test_section_progress', 'test_status' ]
-        format = '<BBBB'
+        id = MAVLINK_MSG_ID_GOPRO_SET_REQUEST
+        name = 'GOPRO_SET_REQUEST'
+        fieldnames = ['target_system', 'target_component', 'cmd_id', 'value']
+        ordered_fieldnames = [ 'target_system', 'target_component', 'cmd_id', 'value' ]
+        format = '<BBB4B'
         native_format = bytearray('<BBBB', 'ascii')
         orders = [0, 1, 2, 3]
-        lengths = [1, 1, 1, 1]
-        array_lengths = [0, 0, 0, 0]
-        crc_extra = 238
+        lengths = [1, 1, 1, 4]
+        array_lengths = [0, 0, 0, 4]
+        crc_extra = 17
 
-        def __init__(self, test, test_section, test_section_progress, test_status):
-                MAVLink_message.__init__(self, MAVLink_gimbal_report_factory_tests_progress_message.id, MAVLink_gimbal_report_factory_tests_progress_message.name)
-                self._fieldnames = MAVLink_gimbal_report_factory_tests_progress_message.fieldnames
-                self.test = test
-                self.test_section = test_section
-                self.test_section_progress = test_section_progress
-                self.test_status = test_status
+        def __init__(self, target_system, target_component, cmd_id, value):
+                MAVLink_message.__init__(self, MAVLink_gopro_set_request_message.id, MAVLink_gopro_set_request_message.name)
+                self._fieldnames = MAVLink_gopro_set_request_message.fieldnames
+                self.target_system = target_system
+                self.target_component = target_component
+                self.cmd_id = cmd_id
+                self.value = value
 
         def pack(self, mav):
-                return MAVLink_message.pack(self, mav, 238, struct.pack('<BBBB', self.test, self.test_section, self.test_section_progress, self.test_status))
+                return MAVLink_message.pack(self, mav, 17, struct.pack('<BBB4B', self.target_system, self.target_component, self.cmd_id, self.value[0], self.value[1], self.value[2], self.value[3]))
 
-class MAVLink_gopro_power_on_message(MAVLink_message):
+class MAVLink_gopro_set_response_message(MAVLink_message):
         '''
-        Instruct a HeroBus attached GoPro to power on
+        Response from a GOPRO_COMMAND set request
         '''
-        id = MAVLINK_MSG_ID_GOPRO_POWER_ON
-        name = 'GOPRO_POWER_ON'
-        fieldnames = ['target_system', 'target_component']
-        ordered_fieldnames = [ 'target_system', 'target_component' ]
+        id = MAVLINK_MSG_ID_GOPRO_SET_RESPONSE
+        name = 'GOPRO_SET_RESPONSE'
+        fieldnames = ['cmd_id', 'status']
+        ordered_fieldnames = [ 'cmd_id', 'status' ]
         format = '<BB'
         native_format = bytearray('<BB', 'ascii')
         orders = [0, 1]
         lengths = [1, 1]
         array_lengths = [0, 0]
-        crc_extra = 241
+        crc_extra = 162
 
-        def __init__(self, target_system, target_component):
-                MAVLink_message.__init__(self, MAVLink_gopro_power_on_message.id, MAVLink_gopro_power_on_message.name)
-                self._fieldnames = MAVLink_gopro_power_on_message.fieldnames
-                self.target_system = target_system
-                self.target_component = target_component
-
-        def pack(self, mav):
-                return MAVLink_message.pack(self, mav, 241, struct.pack('<BB', self.target_system, self.target_component))
-
-class MAVLink_gopro_power_off_message(MAVLink_message):
-        '''
-        Instruct a HeroBus attached GoPro to power off
-        '''
-        id = MAVLINK_MSG_ID_GOPRO_POWER_OFF
-        name = 'GOPRO_POWER_OFF'
-        fieldnames = ['target_system', 'target_component']
-        ordered_fieldnames = [ 'target_system', 'target_component' ]
-        format = '<BB'
-        native_format = bytearray('<BB', 'ascii')
-        orders = [0, 1]
-        lengths = [1, 1]
-        array_lengths = [0, 0]
-        crc_extra = 155
-
-        def __init__(self, target_system, target_component):
-                MAVLink_message.__init__(self, MAVLink_gopro_power_off_message.id, MAVLink_gopro_power_off_message.name)
-                self._fieldnames = MAVLink_gopro_power_off_message.fieldnames
-                self.target_system = target_system
-                self.target_component = target_component
+        def __init__(self, cmd_id, status):
+                MAVLink_message.__init__(self, MAVLink_gopro_set_response_message.id, MAVLink_gopro_set_response_message.name)
+                self._fieldnames = MAVLink_gopro_set_response_message.fieldnames
+                self.cmd_id = cmd_id
+                self.status = status
 
         def pack(self, mav):
-                return MAVLink_message.pack(self, mav, 155, struct.pack('<BB', self.target_system, self.target_component))
-
-class MAVLink_gopro_command_message(MAVLink_message):
-        '''
-        Send a command to a HeroBus attached GoPro.  Will generate a
-        GOPRO_RESPONSE message with results of the command
-        '''
-        id = MAVLINK_MSG_ID_GOPRO_COMMAND
-        name = 'GOPRO_COMMAND'
-        fieldnames = ['target_system', 'target_component', 'gp_cmd_name_1', 'gp_cmd_name_2', 'gp_cmd_parm']
-        ordered_fieldnames = [ 'target_system', 'target_component', 'gp_cmd_name_1', 'gp_cmd_name_2', 'gp_cmd_parm' ]
-        format = '<BBBBB'
-        native_format = bytearray('<BBBBB', 'ascii')
-        orders = [0, 1, 2, 3, 4]
-        lengths = [1, 1, 1, 1, 1]
-        array_lengths = [0, 0, 0, 0, 0]
-        crc_extra = 43
-
-        def __init__(self, target_system, target_component, gp_cmd_name_1, gp_cmd_name_2, gp_cmd_parm):
-                MAVLink_message.__init__(self, MAVLink_gopro_command_message.id, MAVLink_gopro_command_message.name)
-                self._fieldnames = MAVLink_gopro_command_message.fieldnames
-                self.target_system = target_system
-                self.target_component = target_component
-                self.gp_cmd_name_1 = gp_cmd_name_1
-                self.gp_cmd_name_2 = gp_cmd_name_2
-                self.gp_cmd_parm = gp_cmd_parm
-
-        def pack(self, mav):
-                return MAVLink_message.pack(self, mav, 43, struct.pack('<BBBBB', self.target_system, self.target_component, self.gp_cmd_name_1, self.gp_cmd_name_2, self.gp_cmd_parm))
-
-class MAVLink_gopro_response_message(MAVLink_message):
-        '''
-        Response to a command sent to a HeroBus attached GoPro with a
-        GOPRO_COMMAND message.  Contains response from the camera as
-        well as information about any errors encountered while
-        attempting to communicate with the camera
-        '''
-        id = MAVLINK_MSG_ID_GOPRO_RESPONSE
-        name = 'GOPRO_RESPONSE'
-        fieldnames = ['gp_cmd_name_1', 'gp_cmd_name_2', 'gp_cmd_response_status', 'gp_cmd_response_argument', 'gp_cmd_result']
-        ordered_fieldnames = [ 'gp_cmd_result', 'gp_cmd_name_1', 'gp_cmd_name_2', 'gp_cmd_response_status', 'gp_cmd_response_argument' ]
-        format = '<HBBBB'
-        native_format = bytearray('<HBBBB', 'ascii')
-        orders = [1, 2, 3, 4, 0]
-        lengths = [1, 1, 1, 1, 1]
-        array_lengths = [0, 0, 0, 0, 0]
-        crc_extra = 149
-
-        def __init__(self, gp_cmd_name_1, gp_cmd_name_2, gp_cmd_response_status, gp_cmd_response_argument, gp_cmd_result):
-                MAVLink_message.__init__(self, MAVLink_gopro_response_message.id, MAVLink_gopro_response_message.name)
-                self._fieldnames = MAVLink_gopro_response_message.fieldnames
-                self.gp_cmd_name_1 = gp_cmd_name_1
-                self.gp_cmd_name_2 = gp_cmd_name_2
-                self.gp_cmd_response_status = gp_cmd_response_status
-                self.gp_cmd_response_argument = gp_cmd_response_argument
-                self.gp_cmd_result = gp_cmd_result
-
-        def pack(self, mav):
-                return MAVLink_message.pack(self, mav, 149, struct.pack('<HBBBB', self.gp_cmd_result, self.gp_cmd_name_1, self.gp_cmd_name_2, self.gp_cmd_response_status, self.gp_cmd_response_argument))
+                return MAVLink_message.pack(self, mav, 162, struct.pack('<BB', self.cmd_id, self.status))
 
 class MAVLink_rpm_message(MAVLink_message):
         '''
@@ -5665,7 +6060,9 @@ class MAVLink_manual_setpoint_message(MAVLink_message):
 
 class MAVLink_set_attitude_target_message(MAVLink_message):
         '''
-        Set the vehicle attitude and body angular rates.
+        Sets a desired vehicle attitude. Used by an external
+        controller to command the vehicle (manual controller or other
+        system).
         '''
         id = MAVLINK_MSG_ID_SET_ATTITUDE_TARGET
         name = 'SET_ATTITUDE_TARGET'
@@ -5696,7 +6093,10 @@ class MAVLink_set_attitude_target_message(MAVLink_message):
 
 class MAVLink_attitude_target_message(MAVLink_message):
         '''
-        Set the vehicle attitude and body angular rates.
+        Reports the current commanded attitude of the vehicle as
+        specified by the autopilot. This should match the commands
+        sent in a SET_ATTITUDE_TARGET message if the vehicle is being
+        controlled this way.
         '''
         id = MAVLINK_MSG_ID_ATTITUDE_TARGET
         name = 'ATTITUDE_TARGET'
@@ -5725,8 +6125,9 @@ class MAVLink_attitude_target_message(MAVLink_message):
 
 class MAVLink_set_position_target_local_ned_message(MAVLink_message):
         '''
-        Set vehicle position, velocity and acceleration setpoint in
-        local frame.
+        Sets a desired vehicle position in a local north-east-down
+        coordinate frame. Used by an external controller to command
+        the vehicle (manual controller or other system).
         '''
         id = MAVLINK_MSG_ID_SET_POSITION_TARGET_LOCAL_NED
         name = 'SET_POSITION_TARGET_LOCAL_NED'
@@ -5764,8 +6165,10 @@ class MAVLink_set_position_target_local_ned_message(MAVLink_message):
 
 class MAVLink_position_target_local_ned_message(MAVLink_message):
         '''
-        Set vehicle position, velocity and acceleration setpoint in
-        local frame.
+        Reports the current commanded vehicle position, velocity, and
+        acceleration as specified by the autopilot. This should match
+        the commands sent in SET_POSITION_TARGET_LOCAL_NED if the
+        vehicle is being controlled this way.
         '''
         id = MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED
         name = 'POSITION_TARGET_LOCAL_NED'
@@ -5801,8 +6204,10 @@ class MAVLink_position_target_local_ned_message(MAVLink_message):
 
 class MAVLink_set_position_target_global_int_message(MAVLink_message):
         '''
-        Set vehicle position, velocity and acceleration setpoint in
-        the WGS84 coordinate system.
+        Sets a desired vehicle position, velocity, and/or acceleration
+        in a global coordinate system (WGS84). Used by an external
+        controller to command the vehicle (manual controller or other
+        system).
         '''
         id = MAVLINK_MSG_ID_SET_POSITION_TARGET_GLOBAL_INT
         name = 'SET_POSITION_TARGET_GLOBAL_INT'
@@ -5840,8 +6245,10 @@ class MAVLink_set_position_target_global_int_message(MAVLink_message):
 
 class MAVLink_position_target_global_int_message(MAVLink_message):
         '''
-        Set vehicle position, velocity and acceleration setpoint in
-        the WGS84 coordinate system.
+        Reports the current commanded vehicle position, velocity, and
+        acceleration as specified by the autopilot. This should match
+        the commands sent in SET_POSITION_TARGET_GLOBAL_INT if the
+        vehicle is being controlled this way.
         '''
         id = MAVLINK_MSG_ID_POSITION_TARGET_GLOBAL_INT
         name = 'POSITION_TARGET_GLOBAL_INT'
@@ -7327,6 +7734,39 @@ class MAVLink_scaled_pressure3_message(MAVLink_message):
         def pack(self, mav):
                 return MAVLink_message.pack(self, mav, 131, struct.pack('<Iffh', self.time_boot_ms, self.press_abs, self.press_diff, self.temperature))
 
+class MAVLink_follow_target_message(MAVLink_message):
+        '''
+        current motion information from a designated system
+        '''
+        id = MAVLINK_MSG_ID_FOLLOW_TARGET
+        name = 'FOLLOW_TARGET'
+        fieldnames = ['timestamp', 'est_capabilities', 'lat', 'lon', 'alt', 'vel', 'acc', 'attitude_q', 'rates', 'position_cov', 'custom_state']
+        ordered_fieldnames = [ 'timestamp', 'custom_state', 'lat', 'lon', 'alt', 'vel', 'acc', 'attitude_q', 'rates', 'position_cov', 'est_capabilities' ]
+        format = '<QQiif3f3f4f3f3fB'
+        native_format = bytearray('<QQiiffffffB', 'ascii')
+        orders = [0, 10, 2, 3, 4, 5, 6, 7, 8, 9, 1]
+        lengths = [1, 1, 1, 1, 1, 3, 3, 4, 3, 3, 1]
+        array_lengths = [0, 0, 0, 0, 0, 3, 3, 4, 3, 3, 0]
+        crc_extra = 127
+
+        def __init__(self, timestamp, est_capabilities, lat, lon, alt, vel, acc, attitude_q, rates, position_cov, custom_state):
+                MAVLink_message.__init__(self, MAVLink_follow_target_message.id, MAVLink_follow_target_message.name)
+                self._fieldnames = MAVLink_follow_target_message.fieldnames
+                self.timestamp = timestamp
+                self.est_capabilities = est_capabilities
+                self.lat = lat
+                self.lon = lon
+                self.alt = alt
+                self.vel = vel
+                self.acc = acc
+                self.attitude_q = attitude_q
+                self.rates = rates
+                self.position_cov = position_cov
+                self.custom_state = custom_state
+
+        def pack(self, mav):
+                return MAVLink_message.pack(self, mav, 127, struct.pack('<QQiif3f3f4f3f3fB', self.timestamp, self.custom_state, self.lat, self.lon, self.alt, self.vel[0], self.vel[1], self.vel[2], self.acc[0], self.acc[1], self.acc[2], self.attitude_q[0], self.attitude_q[1], self.attitude_q[2], self.attitude_q[3], self.rates[0], self.rates[1], self.rates[2], self.position_cov[0], self.position_cov[1], self.position_cov[2], self.est_capabilities))
+
 class MAVLink_control_system_state_message(MAVLink_message):
         '''
         The smoothed, monotonic system state used to feed the control
@@ -7634,12 +8074,12 @@ class MAVLink_adsb_vehicle_message(MAVLink_message):
         name = 'ADSB_VEHICLE'
         fieldnames = ['ICAO_address', 'lat', 'lon', 'altitude_type', 'altitude', 'heading', 'hor_velocity', 'ver_velocity', 'callsign', 'emitter_type', 'tslc', 'flags', 'squawk']
         ordered_fieldnames = [ 'ICAO_address', 'lat', 'lon', 'altitude', 'heading', 'hor_velocity', 'ver_velocity', 'flags', 'squawk', 'altitude_type', 'callsign', 'emitter_type', 'tslc' ]
-        format = '<IiiiHHHHHB9sBB'
-        native_format = bytearray('<IiiiHHHHHBcBB', 'ascii')
+        format = '<IiiiHHhHHB9sBB'
+        native_format = bytearray('<IiiiHHhHHBcBB', 'ascii')
         orders = [0, 1, 2, 9, 3, 4, 5, 6, 10, 11, 12, 7, 8]
         lengths = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
         array_lengths = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 0, 0]
-        crc_extra = 158
+        crc_extra = 184
 
         def __init__(self, ICAO_address, lat, lon, altitude_type, altitude, heading, hor_velocity, ver_velocity, callsign, emitter_type, tslc, flags, squawk):
                 MAVLink_message.__init__(self, MAVLink_adsb_vehicle_message.id, MAVLink_adsb_vehicle_message.name)
@@ -7659,7 +8099,7 @@ class MAVLink_adsb_vehicle_message(MAVLink_message):
                 self.squawk = squawk
 
         def pack(self, mav):
-                return MAVLink_message.pack(self, mav, 158, struct.pack('<IiiiHHHHHB9sBB', self.ICAO_address, self.lat, self.lon, self.altitude, self.heading, self.hor_velocity, self.ver_velocity, self.flags, self.squawk, self.altitude_type, self.callsign, self.emitter_type, self.tslc))
+                return MAVLink_message.pack(self, mav, 184, struct.pack('<IiiiHHhHHB9sBB', self.ICAO_address, self.lat, self.lon, self.altitude, self.heading, self.hor_velocity, self.ver_velocity, self.flags, self.squawk, self.altitude_type, self.callsign, self.emitter_type, self.tslc))
 
 class MAVLink_v2_extension_message(MAVLink_message):
         '''
@@ -7898,19 +8338,12 @@ mavlink_map = {
         MAVLINK_MSG_ID_PID_TUNING : MAVLink_pid_tuning_message,
         MAVLINK_MSG_ID_GIMBAL_REPORT : MAVLink_gimbal_report_message,
         MAVLINK_MSG_ID_GIMBAL_CONTROL : MAVLink_gimbal_control_message,
-        MAVLINK_MSG_ID_GIMBAL_RESET : MAVLink_gimbal_reset_message,
-        MAVLINK_MSG_ID_GIMBAL_AXIS_CALIBRATION_PROGRESS : MAVLink_gimbal_axis_calibration_progress_message,
-        MAVLINK_MSG_ID_GIMBAL_SET_HOME_OFFSETS : MAVLink_gimbal_set_home_offsets_message,
-        MAVLINK_MSG_ID_GIMBAL_HOME_OFFSET_CALIBRATION_RESULT : MAVLink_gimbal_home_offset_calibration_result_message,
-        MAVLINK_MSG_ID_GIMBAL_SET_FACTORY_PARAMETERS : MAVLink_gimbal_set_factory_parameters_message,
-        MAVLINK_MSG_ID_GIMBAL_FACTORY_PARAMETERS_LOADED : MAVLink_gimbal_factory_parameters_loaded_message,
-        MAVLINK_MSG_ID_GIMBAL_ERASE_FIRMWARE_AND_CONFIG : MAVLink_gimbal_erase_firmware_and_config_message,
-        MAVLINK_MSG_ID_GIMBAL_PERFORM_FACTORY_TESTS : MAVLink_gimbal_perform_factory_tests_message,
-        MAVLINK_MSG_ID_GIMBAL_REPORT_FACTORY_TESTS_PROGRESS : MAVLink_gimbal_report_factory_tests_progress_message,
-        MAVLINK_MSG_ID_GOPRO_POWER_ON : MAVLink_gopro_power_on_message,
-        MAVLINK_MSG_ID_GOPRO_POWER_OFF : MAVLink_gopro_power_off_message,
-        MAVLINK_MSG_ID_GOPRO_COMMAND : MAVLink_gopro_command_message,
-        MAVLINK_MSG_ID_GOPRO_RESPONSE : MAVLink_gopro_response_message,
+        MAVLINK_MSG_ID_GIMBAL_TORQUE_CMD_REPORT : MAVLink_gimbal_torque_cmd_report_message,
+        MAVLINK_MSG_ID_GOPRO_HEARTBEAT : MAVLink_gopro_heartbeat_message,
+        MAVLINK_MSG_ID_GOPRO_GET_REQUEST : MAVLink_gopro_get_request_message,
+        MAVLINK_MSG_ID_GOPRO_GET_RESPONSE : MAVLink_gopro_get_response_message,
+        MAVLINK_MSG_ID_GOPRO_SET_REQUEST : MAVLink_gopro_set_request_message,
+        MAVLINK_MSG_ID_GOPRO_SET_RESPONSE : MAVLink_gopro_set_response_message,
         MAVLINK_MSG_ID_RPM : MAVLink_rpm_message,
         MAVLINK_MSG_ID_HEARTBEAT : MAVLink_heartbeat_message,
         MAVLINK_MSG_ID_SYS_STATUS : MAVLink_sys_status_message,
@@ -8022,6 +8455,7 @@ mavlink_map = {
         MAVLINK_MSG_ID_ALTITUDE : MAVLink_altitude_message,
         MAVLINK_MSG_ID_RESOURCE_REQUEST : MAVLink_resource_request_message,
         MAVLINK_MSG_ID_SCALED_PRESSURE3 : MAVLink_scaled_pressure3_message,
+        MAVLINK_MSG_ID_FOLLOW_TARGET : MAVLink_follow_target_message,
         MAVLINK_MSG_ID_CONTROL_SYSTEM_STATE : MAVLink_control_system_state_message,
         MAVLINK_MSG_ID_BATTERY_STATUS : MAVLink_battery_status_message,
         MAVLINK_MSG_ID_AUTOPILOT_VERSION : MAVLink_autopilot_version_message,
@@ -8301,8 +8735,8 @@ class MAVLink(object):
                 return m
         def sensor_offsets_encode(self, mag_ofs_x, mag_ofs_y, mag_ofs_z, mag_declination, raw_press, raw_temp, gyro_cal_x, gyro_cal_y, gyro_cal_z, accel_cal_x, accel_cal_y, accel_cal_z):
                 '''
-                Offsets and calibrations values for hardware         sensors. This
-                makes it easier to debug the calibration process.
+                Offsets and calibrations values for hardware sensors. This makes it
+                easier to debug the calibration process.
 
                 mag_ofs_x                 : magnetometer X offset (int16_t)
                 mag_ofs_y                 : magnetometer Y offset (int16_t)
@@ -8322,8 +8756,8 @@ class MAVLink(object):
 
         def sensor_offsets_send(self, mag_ofs_x, mag_ofs_y, mag_ofs_z, mag_declination, raw_press, raw_temp, gyro_cal_x, gyro_cal_y, gyro_cal_z, accel_cal_x, accel_cal_y, accel_cal_z):
                 '''
-                Offsets and calibrations values for hardware         sensors. This
-                makes it easier to debug the calibration process.
+                Offsets and calibrations values for hardware sensors. This makes it
+                easier to debug the calibration process.
 
                 mag_ofs_x                 : magnetometer X offset (int16_t)
                 mag_ofs_y                 : magnetometer Y offset (int16_t)
@@ -8575,8 +9009,8 @@ class MAVLink(object):
 
         def fence_point_encode(self, target_system, target_component, idx, count, lat, lng):
                 '''
-                A fence point. Used to set a point when from               GCS -> MAV.
-                Also used to return a point from MAV -> GCS
+                A fence point. Used to set a point when from GCS -> MAV. Also used to
+                return a point from MAV -> GCS
 
                 target_system             : System ID (uint8_t)
                 target_component          : Component ID (uint8_t)
@@ -8590,8 +9024,8 @@ class MAVLink(object):
 
         def fence_point_send(self, target_system, target_component, idx, count, lat, lng):
                 '''
-                A fence point. Used to set a point when from               GCS -> MAV.
-                Also used to return a point from MAV -> GCS
+                A fence point. Used to set a point when from GCS -> MAV. Also used to
+                return a point from MAV -> GCS
 
                 target_system             : System ID (uint8_t)
                 target_component          : Component ID (uint8_t)
@@ -8627,8 +9061,8 @@ class MAVLink(object):
 
         def fence_status_encode(self, breach_status, breach_count, breach_type, breach_time):
                 '''
-                Status of geo-fencing. Sent in extended             status stream when
-                fencing enabled
+                Status of geo-fencing. Sent in extended status stream when fencing
+                enabled
 
                 breach_status             : 0 if currently inside fence, 1 if outside (uint8_t)
                 breach_count              : number of fence breaches (uint16_t)
@@ -8640,8 +9074,8 @@ class MAVLink(object):
 
         def fence_status_send(self, breach_status, breach_count, breach_type, breach_time):
                 '''
-                Status of geo-fencing. Sent in extended             status stream when
-                fencing enabled
+                Status of geo-fencing. Sent in extended status stream when fencing
+                enabled
 
                 breach_status             : 0 if currently inside fence, 1 if outside (uint8_t)
                 breach_count              : number of fence breaches (uint16_t)
@@ -8771,8 +9205,8 @@ class MAVLink(object):
 
         def limits_status_encode(self, limits_state, last_trigger, last_action, last_recovery, last_clear, breach_count, mods_enabled, mods_required, mods_triggered):
                 '''
-                Status of AP_Limits. Sent in extended             status stream when
-                AP_Limits is enabled
+                Status of AP_Limits. Sent in extended status stream when AP_Limits is
+                enabled
 
                 limits_state              : state of AP_Limits, (see enum LimitState, LIMITS_STATE) (uint8_t)
                 last_trigger              : time of last breach in milliseconds since boot (uint32_t)
@@ -8789,8 +9223,8 @@ class MAVLink(object):
 
         def limits_status_send(self, limits_state, last_trigger, last_action, last_recovery, last_clear, breach_count, mods_enabled, mods_required, mods_triggered):
                 '''
-                Status of AP_Limits. Sent in extended             status stream when
-                AP_Limits is enabled
+                Status of AP_Limits. Sent in extended status stream when AP_Limits is
+                enabled
 
                 limits_state              : state of AP_Limits, (see enum LimitState, LIMITS_STATE) (uint8_t)
                 last_trigger              : time of last breach in milliseconds since boot (uint32_t)
@@ -9465,7 +9899,7 @@ class MAVLink(object):
 
         def gimbal_report_encode(self, target_system, target_component, delta_time, delta_angle_x, delta_angle_y, delta_angle_z, delta_velocity_x, delta_velocity_y, delta_velocity_z, joint_roll, joint_el, joint_az):
                 '''
-                3 axis gimbal measurements
+                3 axis gimbal mesuraments
 
                 target_system             : System ID (uint8_t)
                 target_component          : Component ID (uint8_t)
@@ -9485,7 +9919,7 @@ class MAVLink(object):
 
         def gimbal_report_send(self, target_system, target_component, delta_time, delta_angle_x, delta_angle_y, delta_angle_z, delta_velocity_x, delta_velocity_y, delta_velocity_z, joint_roll, joint_el, joint_az):
                 '''
-                3 axis gimbal measurements
+                3 axis gimbal mesuraments
 
                 target_system             : System ID (uint8_t)
                 target_component          : Component ID (uint8_t)
@@ -9529,367 +9963,141 @@ class MAVLink(object):
                 '''
                 return self.send(self.gimbal_control_encode(target_system, target_component, demanded_rate_x, demanded_rate_y, demanded_rate_z))
 
-        def gimbal_reset_encode(self, target_system, target_component):
+        def gimbal_torque_cmd_report_encode(self, target_system, target_component, rl_torque_cmd, el_torque_cmd, az_torque_cmd):
                 '''
-                Causes the gimbal to reset and boot as if it was just powered on
+                100 Hz gimbal torque command telemetry
 
                 target_system             : System ID (uint8_t)
                 target_component          : Component ID (uint8_t)
+                rl_torque_cmd             : Roll Torque Command (int16_t)
+                el_torque_cmd             : Elevation Torque Command (int16_t)
+                az_torque_cmd             : Azimuth Torque Command (int16_t)
 
                 '''
-                return MAVLink_gimbal_reset_message(target_system, target_component)
+                return MAVLink_gimbal_torque_cmd_report_message(target_system, target_component, rl_torque_cmd, el_torque_cmd, az_torque_cmd)
 
-        def gimbal_reset_send(self, target_system, target_component):
+        def gimbal_torque_cmd_report_send(self, target_system, target_component, rl_torque_cmd, el_torque_cmd, az_torque_cmd):
                 '''
-                Causes the gimbal to reset and boot as if it was just powered on
+                100 Hz gimbal torque command telemetry
 
                 target_system             : System ID (uint8_t)
                 target_component          : Component ID (uint8_t)
+                rl_torque_cmd             : Roll Torque Command (int16_t)
+                el_torque_cmd             : Elevation Torque Command (int16_t)
+                az_torque_cmd             : Azimuth Torque Command (int16_t)
 
                 '''
-                return self.send(self.gimbal_reset_encode(target_system, target_component))
+                return self.send(self.gimbal_torque_cmd_report_encode(target_system, target_component, rl_torque_cmd, el_torque_cmd, az_torque_cmd))
 
-        def gimbal_axis_calibration_progress_encode(self, calibration_axis, calibration_progress, calibration_status):
+        def gopro_heartbeat_encode(self, status, capture_mode, flags):
                 '''
-                Reports progress and success or failure of gimbal axis calibration
-                procedure
+                Heartbeat from a HeroBus attached GoPro
 
-                calibration_axis          : Which gimbal axis we're reporting calibration progress for (uint8_t)
-                calibration_progress        : The current calibration progress for this axis, 0x64=100% (uint8_t)
-                calibration_status        : The status of the running calibration (uint8_t)
-
-                '''
-                return MAVLink_gimbal_axis_calibration_progress_message(calibration_axis, calibration_progress, calibration_status)
-
-        def gimbal_axis_calibration_progress_send(self, calibration_axis, calibration_progress, calibration_status):
-                '''
-                Reports progress and success or failure of gimbal axis calibration
-                procedure
-
-                calibration_axis          : Which gimbal axis we're reporting calibration progress for (uint8_t)
-                calibration_progress        : The current calibration progress for this axis, 0x64=100% (uint8_t)
-                calibration_status        : The status of the running calibration (uint8_t)
+                status                    : Status (uint8_t)
+                capture_mode              : Current capture mode (uint8_t)
+                flags                     : additional status bits (uint8_t)
 
                 '''
-                return self.send(self.gimbal_axis_calibration_progress_encode(calibration_axis, calibration_progress, calibration_status))
+                return MAVLink_gopro_heartbeat_message(status, capture_mode, flags)
 
-        def gimbal_set_home_offsets_encode(self, target_system, target_component):
+        def gopro_heartbeat_send(self, status, capture_mode, flags):
                 '''
-                Instructs the gimbal to set its current position as its new home
-                position.  Will primarily be used for factory
-                calibration
+                Heartbeat from a HeroBus attached GoPro
+
+                status                    : Status (uint8_t)
+                capture_mode              : Current capture mode (uint8_t)
+                flags                     : additional status bits (uint8_t)
+
+                '''
+                return self.send(self.gopro_heartbeat_encode(status, capture_mode, flags))
+
+        def gopro_get_request_encode(self, target_system, target_component, cmd_id):
+                '''
+                Request a GOPRO_COMMAND response from the GoPro
 
                 target_system             : System ID (uint8_t)
                 target_component          : Component ID (uint8_t)
+                cmd_id                    : Command ID (uint8_t)
 
                 '''
-                return MAVLink_gimbal_set_home_offsets_message(target_system, target_component)
+                return MAVLink_gopro_get_request_message(target_system, target_component, cmd_id)
 
-        def gimbal_set_home_offsets_send(self, target_system, target_component):
+        def gopro_get_request_send(self, target_system, target_component, cmd_id):
                 '''
-                Instructs the gimbal to set its current position as its new home
-                position.  Will primarily be used for factory
-                calibration
+                Request a GOPRO_COMMAND response from the GoPro
 
                 target_system             : System ID (uint8_t)
                 target_component          : Component ID (uint8_t)
+                cmd_id                    : Command ID (uint8_t)
 
                 '''
-                return self.send(self.gimbal_set_home_offsets_encode(target_system, target_component))
+                return self.send(self.gopro_get_request_encode(target_system, target_component, cmd_id))
 
-        def gimbal_home_offset_calibration_result_encode(self, calibration_result):
+        def gopro_get_response_encode(self, cmd_id, status, value):
                 '''
-                Sent by the gimbal after it receives a SET_HOME_OFFSETS message to
-                indicate the result of the home offset calibration
+                Response from a GOPRO_COMMAND get request
 
-                calibration_result        : The result of the home offset calibration (uint8_t)
-
-                '''
-                return MAVLink_gimbal_home_offset_calibration_result_message(calibration_result)
-
-        def gimbal_home_offset_calibration_result_send(self, calibration_result):
-                '''
-                Sent by the gimbal after it receives a SET_HOME_OFFSETS message to
-                indicate the result of the home offset calibration
-
-                calibration_result        : The result of the home offset calibration (uint8_t)
+                cmd_id                    : Command ID (uint8_t)
+                status                    : Status (uint8_t)
+                value                     : Value (uint8_t)
 
                 '''
-                return self.send(self.gimbal_home_offset_calibration_result_encode(calibration_result))
+                return MAVLink_gopro_get_response_message(cmd_id, status, value)
 
-        def gimbal_set_factory_parameters_encode(self, target_system, target_component, magic_1, magic_2, magic_3, assembly_year, assembly_month, assembly_day, assembly_hour, assembly_minute, assembly_second, serial_number_pt_1, serial_number_pt_2, serial_number_pt_3):
+        def gopro_get_response_send(self, cmd_id, status, value):
                 '''
-                Set factory configuration parameters (such as assembly date and time,
-                and serial number).  This is only intended to be used
-                during manufacture, not by end users, so it is
-                protected by a simple checksum of sorts (this won't
-                stop anybody determined,             it's mostly just
-                to keep the average user from trying to modify these
-                values.  This will need to be revisited if that isn't
-                adequate.
+                Response from a GOPRO_COMMAND get request
+
+                cmd_id                    : Command ID (uint8_t)
+                status                    : Status (uint8_t)
+                value                     : Value (uint8_t)
+
+                '''
+                return self.send(self.gopro_get_response_encode(cmd_id, status, value))
+
+        def gopro_set_request_encode(self, target_system, target_component, cmd_id, value):
+                '''
+                Request to set a GOPRO_COMMAND with a desired
 
                 target_system             : System ID (uint8_t)
                 target_component          : Component ID (uint8_t)
-                magic_1                   : Magic number 1 for validation (uint32_t)
-                magic_2                   : Magic number 2 for validation (uint32_t)
-                magic_3                   : Magic number 3 for validation (uint32_t)
-                assembly_year             : Assembly Date Year (uint16_t)
-                assembly_month            : Assembly Date Month (uint8_t)
-                assembly_day              : Assembly Date Day (uint8_t)
-                assembly_hour             : Assembly Time Hour (uint8_t)
-                assembly_minute           : Assembly Time Minute (uint8_t)
-                assembly_second           : Assembly Time Second (uint8_t)
-                serial_number_pt_1        : Unit Serial Number Part 1 (part code, design, language/country) (uint32_t)
-                serial_number_pt_2        : Unit Serial Number Part 2 (option, year, month) (uint32_t)
-                serial_number_pt_3        : Unit Serial Number Part 3 (incrementing serial number per month) (uint32_t)
+                cmd_id                    : Command ID (uint8_t)
+                value                     : Value (uint8_t)
 
                 '''
-                return MAVLink_gimbal_set_factory_parameters_message(target_system, target_component, magic_1, magic_2, magic_3, assembly_year, assembly_month, assembly_day, assembly_hour, assembly_minute, assembly_second, serial_number_pt_1, serial_number_pt_2, serial_number_pt_3)
+                return MAVLink_gopro_set_request_message(target_system, target_component, cmd_id, value)
 
-        def gimbal_set_factory_parameters_send(self, target_system, target_component, magic_1, magic_2, magic_3, assembly_year, assembly_month, assembly_day, assembly_hour, assembly_minute, assembly_second, serial_number_pt_1, serial_number_pt_2, serial_number_pt_3):
+        def gopro_set_request_send(self, target_system, target_component, cmd_id, value):
                 '''
-                Set factory configuration parameters (such as assembly date and time,
-                and serial number).  This is only intended to be used
-                during manufacture, not by end users, so it is
-                protected by a simple checksum of sorts (this won't
-                stop anybody determined,             it's mostly just
-                to keep the average user from trying to modify these
-                values.  This will need to be revisited if that isn't
-                adequate.
+                Request to set a GOPRO_COMMAND with a desired
 
                 target_system             : System ID (uint8_t)
                 target_component          : Component ID (uint8_t)
-                magic_1                   : Magic number 1 for validation (uint32_t)
-                magic_2                   : Magic number 2 for validation (uint32_t)
-                magic_3                   : Magic number 3 for validation (uint32_t)
-                assembly_year             : Assembly Date Year (uint16_t)
-                assembly_month            : Assembly Date Month (uint8_t)
-                assembly_day              : Assembly Date Day (uint8_t)
-                assembly_hour             : Assembly Time Hour (uint8_t)
-                assembly_minute           : Assembly Time Minute (uint8_t)
-                assembly_second           : Assembly Time Second (uint8_t)
-                serial_number_pt_1        : Unit Serial Number Part 1 (part code, design, language/country) (uint32_t)
-                serial_number_pt_2        : Unit Serial Number Part 2 (option, year, month) (uint32_t)
-                serial_number_pt_3        : Unit Serial Number Part 3 (incrementing serial number per month) (uint32_t)
+                cmd_id                    : Command ID (uint8_t)
+                value                     : Value (uint8_t)
 
                 '''
-                return self.send(self.gimbal_set_factory_parameters_encode(target_system, target_component, magic_1, magic_2, magic_3, assembly_year, assembly_month, assembly_day, assembly_hour, assembly_minute, assembly_second, serial_number_pt_1, serial_number_pt_2, serial_number_pt_3))
+                return self.send(self.gopro_set_request_encode(target_system, target_component, cmd_id, value))
 
-        def gimbal_factory_parameters_loaded_encode(self, dummy):
+        def gopro_set_response_encode(self, cmd_id, status):
                 '''
-                Sent by the gimbal after the factory parameters are successfully
-                loaded, to inform the factory software that the load
-                is complete
+                Response from a GOPRO_COMMAND set request
 
-                dummy                     : Dummy field because mavgen doesn't allow messages with no fields (uint8_t)
-
-                '''
-                return MAVLink_gimbal_factory_parameters_loaded_message(dummy)
-
-        def gimbal_factory_parameters_loaded_send(self, dummy):
-                '''
-                Sent by the gimbal after the factory parameters are successfully
-                loaded, to inform the factory software that the load
-                is complete
-
-                dummy                     : Dummy field because mavgen doesn't allow messages with no fields (uint8_t)
+                cmd_id                    : Command ID (uint8_t)
+                status                    : Status (uint8_t)
 
                 '''
-                return self.send(self.gimbal_factory_parameters_loaded_encode(dummy))
+                return MAVLink_gopro_set_response_message(cmd_id, status)
 
-        def gimbal_erase_firmware_and_config_encode(self, target_system, target_component, knock):
+        def gopro_set_response_send(self, cmd_id, status):
                 '''
-                Commands the gimbal to erase its firmware image and flash
-                configuration, leaving only the bootloader.  The
-                gimbal will then reboot into the bootloader,
-                ready for the load of a new application firmware
-                image.  Erasing the flash configuration will cause the
-                gimbal to re-perform axis calibration when a
-                new firmware image is loaded, and will cause all
-                tuning parameters to return to their factory defaults.
-                WARNING: sending this command will render a
-                gimbal inoperable until a new firmware image is loaded
-                onto it.  For this reason, a particular "knock" value
-                must be sent for the command to take effect.
-                Use this command at your own risk
+                Response from a GOPRO_COMMAND set request
 
-                target_system             : System ID (uint8_t)
-                target_component          : Component ID (uint8_t)
-                knock                     : Knock value to confirm this is a valid request (uint32_t)
+                cmd_id                    : Command ID (uint8_t)
+                status                    : Status (uint8_t)
 
                 '''
-                return MAVLink_gimbal_erase_firmware_and_config_message(target_system, target_component, knock)
-
-        def gimbal_erase_firmware_and_config_send(self, target_system, target_component, knock):
-                '''
-                Commands the gimbal to erase its firmware image and flash
-                configuration, leaving only the bootloader.  The
-                gimbal will then reboot into the bootloader,
-                ready for the load of a new application firmware
-                image.  Erasing the flash configuration will cause the
-                gimbal to re-perform axis calibration when a
-                new firmware image is loaded, and will cause all
-                tuning parameters to return to their factory defaults.
-                WARNING: sending this command will render a
-                gimbal inoperable until a new firmware image is loaded
-                onto it.  For this reason, a particular "knock" value
-                must be sent for the command to take effect.
-                Use this command at your own risk
-
-                target_system             : System ID (uint8_t)
-                target_component          : Component ID (uint8_t)
-                knock                     : Knock value to confirm this is a valid request (uint32_t)
-
-                '''
-                return self.send(self.gimbal_erase_firmware_and_config_encode(target_system, target_component, knock))
-
-        def gimbal_perform_factory_tests_encode(self, target_system, target_component):
-                '''
-                Command the gimbal to perform a series of factory tests.  Should not
-                be needed by end users
-
-                target_system             : System ID (uint8_t)
-                target_component          : Component ID (uint8_t)
-
-                '''
-                return MAVLink_gimbal_perform_factory_tests_message(target_system, target_component)
-
-        def gimbal_perform_factory_tests_send(self, target_system, target_component):
-                '''
-                Command the gimbal to perform a series of factory tests.  Should not
-                be needed by end users
-
-                target_system             : System ID (uint8_t)
-                target_component          : Component ID (uint8_t)
-
-                '''
-                return self.send(self.gimbal_perform_factory_tests_encode(target_system, target_component))
-
-        def gimbal_report_factory_tests_progress_encode(self, test, test_section, test_section_progress, test_status):
-                '''
-                Reports the current status of a section of a running factory test
-
-                test                      : Which factory test is currently running (uint8_t)
-                test_section              : Which section of the test is currently running.  The meaning of this is test-dependent (uint8_t)
-                test_section_progress        : The progress of the current test section, 0x64=100% (uint8_t)
-                test_status               : The status of the currently executing test section.  The meaning of this is test and section-dependent (uint8_t)
-
-                '''
-                return MAVLink_gimbal_report_factory_tests_progress_message(test, test_section, test_section_progress, test_status)
-
-        def gimbal_report_factory_tests_progress_send(self, test, test_section, test_section_progress, test_status):
-                '''
-                Reports the current status of a section of a running factory test
-
-                test                      : Which factory test is currently running (uint8_t)
-                test_section              : Which section of the test is currently running.  The meaning of this is test-dependent (uint8_t)
-                test_section_progress        : The progress of the current test section, 0x64=100% (uint8_t)
-                test_status               : The status of the currently executing test section.  The meaning of this is test and section-dependent (uint8_t)
-
-                '''
-                return self.send(self.gimbal_report_factory_tests_progress_encode(test, test_section, test_section_progress, test_status))
-
-        def gopro_power_on_encode(self, target_system, target_component):
-                '''
-                Instruct a HeroBus attached GoPro to power on
-
-                target_system             : System ID (uint8_t)
-                target_component          : Component ID (uint8_t)
-
-                '''
-                return MAVLink_gopro_power_on_message(target_system, target_component)
-
-        def gopro_power_on_send(self, target_system, target_component):
-                '''
-                Instruct a HeroBus attached GoPro to power on
-
-                target_system             : System ID (uint8_t)
-                target_component          : Component ID (uint8_t)
-
-                '''
-                return self.send(self.gopro_power_on_encode(target_system, target_component))
-
-        def gopro_power_off_encode(self, target_system, target_component):
-                '''
-                Instruct a HeroBus attached GoPro to power off
-
-                target_system             : System ID (uint8_t)
-                target_component          : Component ID (uint8_t)
-
-                '''
-                return MAVLink_gopro_power_off_message(target_system, target_component)
-
-        def gopro_power_off_send(self, target_system, target_component):
-                '''
-                Instruct a HeroBus attached GoPro to power off
-
-                target_system             : System ID (uint8_t)
-                target_component          : Component ID (uint8_t)
-
-                '''
-                return self.send(self.gopro_power_off_encode(target_system, target_component))
-
-        def gopro_command_encode(self, target_system, target_component, gp_cmd_name_1, gp_cmd_name_2, gp_cmd_parm):
-                '''
-                Send a command to a HeroBus attached GoPro.  Will generate a
-                GOPRO_RESPONSE message with results of the command
-
-                target_system             : System ID (uint8_t)
-                target_component          : Component ID (uint8_t)
-                gp_cmd_name_1             : First character of the 2 character GoPro command (uint8_t)
-                gp_cmd_name_2             : Second character of the 2 character GoPro command (uint8_t)
-                gp_cmd_parm               : Parameter for the command (uint8_t)
-
-                '''
-                return MAVLink_gopro_command_message(target_system, target_component, gp_cmd_name_1, gp_cmd_name_2, gp_cmd_parm)
-
-        def gopro_command_send(self, target_system, target_component, gp_cmd_name_1, gp_cmd_name_2, gp_cmd_parm):
-                '''
-                Send a command to a HeroBus attached GoPro.  Will generate a
-                GOPRO_RESPONSE message with results of the command
-
-                target_system             : System ID (uint8_t)
-                target_component          : Component ID (uint8_t)
-                gp_cmd_name_1             : First character of the 2 character GoPro command (uint8_t)
-                gp_cmd_name_2             : Second character of the 2 character GoPro command (uint8_t)
-                gp_cmd_parm               : Parameter for the command (uint8_t)
-
-                '''
-                return self.send(self.gopro_command_encode(target_system, target_component, gp_cmd_name_1, gp_cmd_name_2, gp_cmd_parm))
-
-        def gopro_response_encode(self, gp_cmd_name_1, gp_cmd_name_2, gp_cmd_response_status, gp_cmd_response_argument, gp_cmd_result):
-                '''
-                Response to a command sent to a HeroBus attached GoPro with a
-                GOPRO_COMMAND message.  Contains response from the
-                camera as well as information about any errors
-                encountered while attempting to communicate with the
-                camera
-
-                gp_cmd_name_1             : First character of the 2 character GoPro command that generated this response (uint8_t)
-                gp_cmd_name_2             : Second character of the 2 character GoPro command that generated this response (uint8_t)
-                gp_cmd_response_status        : Response byte from the GoPro's response to the command.  0 = Success, 1 = Failure (uint8_t)
-                gp_cmd_response_argument        : Response argument from the GoPro's response to the command (uint8_t)
-                gp_cmd_result             : Result of the command attempt to the GoPro, as defined by GOPRO_CMD_RESULT enum. (uint16_t)
-
-                '''
-                return MAVLink_gopro_response_message(gp_cmd_name_1, gp_cmd_name_2, gp_cmd_response_status, gp_cmd_response_argument, gp_cmd_result)
-
-        def gopro_response_send(self, gp_cmd_name_1, gp_cmd_name_2, gp_cmd_response_status, gp_cmd_response_argument, gp_cmd_result):
-                '''
-                Response to a command sent to a HeroBus attached GoPro with a
-                GOPRO_COMMAND message.  Contains response from the
-                camera as well as information about any errors
-                encountered while attempting to communicate with the
-                camera
-
-                gp_cmd_name_1             : First character of the 2 character GoPro command that generated this response (uint8_t)
-                gp_cmd_name_2             : Second character of the 2 character GoPro command that generated this response (uint8_t)
-                gp_cmd_response_status        : Response byte from the GoPro's response to the command.  0 = Success, 1 = Failure (uint8_t)
-                gp_cmd_response_argument        : Response argument from the GoPro's response to the command (uint8_t)
-                gp_cmd_result             : Result of the command attempt to the GoPro, as defined by GOPRO_CMD_RESULT enum. (uint16_t)
-
-                '''
-                return self.send(self.gopro_response_encode(gp_cmd_name_1, gp_cmd_name_2, gp_cmd_response_status, gp_cmd_response_argument, gp_cmd_result))
+                return self.send(self.gopro_set_response_encode(cmd_id, status))
 
         def rpm_encode(self, rpm1, rpm2):
                 '''
@@ -10483,8 +10691,8 @@ class MAVLink(object):
 
                 time_usec                 : Timestamp (microseconds since UNIX epoch or microseconds since system boot) (uint64_t)
                 press_abs                 : Absolute pressure (raw) (int16_t)
-                press_diff1               : Differential pressure 1 (raw) (int16_t)
-                press_diff2               : Differential pressure 2 (raw) (int16_t)
+                press_diff1               : Differential pressure 1 (raw, 0 if nonexistant) (int16_t)
+                press_diff2               : Differential pressure 2 (raw, 0 if nonexistant) (int16_t)
                 temperature               : Raw Temperature measurement (raw) (int16_t)
 
                 '''
@@ -10498,8 +10706,8 @@ class MAVLink(object):
 
                 time_usec                 : Timestamp (microseconds since UNIX epoch or microseconds since system boot) (uint64_t)
                 press_abs                 : Absolute pressure (raw) (int16_t)
-                press_diff1               : Differential pressure 1 (raw) (int16_t)
-                press_diff2               : Differential pressure 2 (raw) (int16_t)
+                press_diff1               : Differential pressure 1 (raw, 0 if nonexistant) (int16_t)
+                press_diff2               : Differential pressure 2 (raw, 0 if nonexistant) (int16_t)
                 temperature               : Raw Temperature measurement (raw) (int16_t)
 
                 '''
@@ -10647,14 +10855,14 @@ class MAVLink(object):
                 resolution of float is not sufficient.
 
                 time_boot_ms              : Timestamp (milliseconds since system boot) (uint32_t)
-                lat                       : Latitude, expressed as * 1E7 (int32_t)
-                lon                       : Longitude, expressed as * 1E7 (int32_t)
+                lat                       : Latitude, expressed as degrees * 1E7 (int32_t)
+                lon                       : Longitude, expressed as degrees * 1E7 (int32_t)
                 alt                       : Altitude in meters, expressed as * 1000 (millimeters), AMSL (not WGS84 - note that virtually all GPS modules provide the AMSL as well) (int32_t)
                 relative_alt              : Altitude above ground in meters, expressed as * 1000 (millimeters) (int32_t)
-                vx                        : Ground X Speed (Latitude), expressed as m/s * 100 (int16_t)
-                vy                        : Ground Y Speed (Longitude), expressed as m/s * 100 (int16_t)
-                vz                        : Ground Z Speed (Altitude), expressed as m/s * 100 (int16_t)
-                hdg                       : Compass heading in degrees * 100, 0.0..359.99 degrees. If unknown, set to: UINT16_MAX (uint16_t)
+                vx                        : Ground X Speed (Latitude, positive north), expressed as m/s * 100 (int16_t)
+                vy                        : Ground Y Speed (Longitude, positive east), expressed as m/s * 100 (int16_t)
+                vz                        : Ground Z Speed (Altitude, positive down), expressed as m/s * 100 (int16_t)
+                hdg                       : Vehicle heading (yaw angle) in degrees * 100, 0.0..359.99 degrees. If unknown, set to: UINT16_MAX (uint16_t)
 
                 '''
                 return MAVLink_global_position_int_message(time_boot_ms, lat, lon, alt, relative_alt, vx, vy, vz, hdg)
@@ -10667,14 +10875,14 @@ class MAVLink(object):
                 resolution of float is not sufficient.
 
                 time_boot_ms              : Timestamp (milliseconds since system boot) (uint32_t)
-                lat                       : Latitude, expressed as * 1E7 (int32_t)
-                lon                       : Longitude, expressed as * 1E7 (int32_t)
+                lat                       : Latitude, expressed as degrees * 1E7 (int32_t)
+                lon                       : Longitude, expressed as degrees * 1E7 (int32_t)
                 alt                       : Altitude in meters, expressed as * 1000 (millimeters), AMSL (not WGS84 - note that virtually all GPS modules provide the AMSL as well) (int32_t)
                 relative_alt              : Altitude above ground in meters, expressed as * 1000 (millimeters) (int32_t)
-                vx                        : Ground X Speed (Latitude), expressed as m/s * 100 (int16_t)
-                vy                        : Ground Y Speed (Longitude), expressed as m/s * 100 (int16_t)
-                vz                        : Ground Z Speed (Altitude), expressed as m/s * 100 (int16_t)
-                hdg                       : Compass heading in degrees * 100, 0.0..359.99 degrees. If unknown, set to: UINT16_MAX (uint16_t)
+                vx                        : Ground X Speed (Latitude, positive north), expressed as m/s * 100 (int16_t)
+                vy                        : Ground Y Speed (Longitude, positive east), expressed as m/s * 100 (int16_t)
+                vz                        : Ground Z Speed (Altitude, positive down), expressed as m/s * 100 (int16_t)
+                hdg                       : Vehicle heading (yaw angle) in degrees * 100, 0.0..359.99 degrees. If unknown, set to: UINT16_MAX (uint16_t)
 
                 '''
                 return self.send(self.global_position_int_encode(time_boot_ms, lat, lon, alt, relative_alt, vx, vy, vz, hdg))
@@ -11873,7 +12081,9 @@ class MAVLink(object):
 
         def set_attitude_target_encode(self, time_boot_ms, target_system, target_component, type_mask, q, body_roll_rate, body_pitch_rate, body_yaw_rate, thrust):
                 '''
-                Set the vehicle attitude and body angular rates.
+                Sets a desired vehicle attitude. Used by an external controller to
+                command the vehicle (manual controller or other
+                system).
 
                 time_boot_ms              : Timestamp in milliseconds since system boot (uint32_t)
                 target_system             : System ID (uint8_t)
@@ -11890,7 +12100,9 @@ class MAVLink(object):
 
         def set_attitude_target_send(self, time_boot_ms, target_system, target_component, type_mask, q, body_roll_rate, body_pitch_rate, body_yaw_rate, thrust):
                 '''
-                Set the vehicle attitude and body angular rates.
+                Sets a desired vehicle attitude. Used by an external controller to
+                command the vehicle (manual controller or other
+                system).
 
                 time_boot_ms              : Timestamp in milliseconds since system boot (uint32_t)
                 target_system             : System ID (uint8_t)
@@ -11907,7 +12119,10 @@ class MAVLink(object):
 
         def attitude_target_encode(self, time_boot_ms, type_mask, q, body_roll_rate, body_pitch_rate, body_yaw_rate, thrust):
                 '''
-                Set the vehicle attitude and body angular rates.
+                Reports the current commanded attitude of the vehicle as specified by
+                the autopilot. This should match the commands sent in
+                a SET_ATTITUDE_TARGET message if the vehicle is being
+                controlled this way.
 
                 time_boot_ms              : Timestamp in milliseconds since system boot (uint32_t)
                 type_mask                 : Mappings: If any of these bits are set, the corresponding input should be ignored: bit 1: body roll rate, bit 2: body pitch rate, bit 3: body yaw rate. bit 4-bit 7: reserved, bit 8: attitude (uint8_t)
@@ -11922,7 +12137,10 @@ class MAVLink(object):
 
         def attitude_target_send(self, time_boot_ms, type_mask, q, body_roll_rate, body_pitch_rate, body_yaw_rate, thrust):
                 '''
-                Set the vehicle attitude and body angular rates.
+                Reports the current commanded attitude of the vehicle as specified by
+                the autopilot. This should match the commands sent in
+                a SET_ATTITUDE_TARGET message if the vehicle is being
+                controlled this way.
 
                 time_boot_ms              : Timestamp in milliseconds since system boot (uint32_t)
                 type_mask                 : Mappings: If any of these bits are set, the corresponding input should be ignored: bit 1: body roll rate, bit 2: body pitch rate, bit 3: body yaw rate. bit 4-bit 7: reserved, bit 8: attitude (uint8_t)
@@ -11937,8 +12155,9 @@ class MAVLink(object):
 
         def set_position_target_local_ned_encode(self, time_boot_ms, target_system, target_component, coordinate_frame, type_mask, x, y, z, vx, vy, vz, afx, afy, afz, yaw, yaw_rate):
                 '''
-                Set vehicle position, velocity and acceleration setpoint in local
-                frame.
+                Sets a desired vehicle position in a local north-east-down coordinate
+                frame. Used by an external controller to command the
+                vehicle (manual controller or other system).
 
                 time_boot_ms              : Timestamp in milliseconds since system boot (uint32_t)
                 target_system             : System ID (uint8_t)
@@ -11962,8 +12181,9 @@ class MAVLink(object):
 
         def set_position_target_local_ned_send(self, time_boot_ms, target_system, target_component, coordinate_frame, type_mask, x, y, z, vx, vy, vz, afx, afy, afz, yaw, yaw_rate):
                 '''
-                Set vehicle position, velocity and acceleration setpoint in local
-                frame.
+                Sets a desired vehicle position in a local north-east-down coordinate
+                frame. Used by an external controller to command the
+                vehicle (manual controller or other system).
 
                 time_boot_ms              : Timestamp in milliseconds since system boot (uint32_t)
                 target_system             : System ID (uint8_t)
@@ -11987,8 +12207,11 @@ class MAVLink(object):
 
         def position_target_local_ned_encode(self, time_boot_ms, coordinate_frame, type_mask, x, y, z, vx, vy, vz, afx, afy, afz, yaw, yaw_rate):
                 '''
-                Set vehicle position, velocity and acceleration setpoint in local
-                frame.
+                Reports the current commanded vehicle position, velocity, and
+                acceleration as specified by the autopilot. This
+                should match the commands sent in
+                SET_POSITION_TARGET_LOCAL_NED if the vehicle is being
+                controlled this way.
 
                 time_boot_ms              : Timestamp in milliseconds since system boot (uint32_t)
                 coordinate_frame          : Valid options are: MAV_FRAME_LOCAL_NED = 1, MAV_FRAME_LOCAL_OFFSET_NED = 7, MAV_FRAME_BODY_NED = 8, MAV_FRAME_BODY_OFFSET_NED = 9 (uint8_t)
@@ -12010,8 +12233,11 @@ class MAVLink(object):
 
         def position_target_local_ned_send(self, time_boot_ms, coordinate_frame, type_mask, x, y, z, vx, vy, vz, afx, afy, afz, yaw, yaw_rate):
                 '''
-                Set vehicle position, velocity and acceleration setpoint in local
-                frame.
+                Reports the current commanded vehicle position, velocity, and
+                acceleration as specified by the autopilot. This
+                should match the commands sent in
+                SET_POSITION_TARGET_LOCAL_NED if the vehicle is being
+                controlled this way.
 
                 time_boot_ms              : Timestamp in milliseconds since system boot (uint32_t)
                 coordinate_frame          : Valid options are: MAV_FRAME_LOCAL_NED = 1, MAV_FRAME_LOCAL_OFFSET_NED = 7, MAV_FRAME_BODY_NED = 8, MAV_FRAME_BODY_OFFSET_NED = 9 (uint8_t)
@@ -12033,8 +12259,10 @@ class MAVLink(object):
 
         def set_position_target_global_int_encode(self, time_boot_ms, target_system, target_component, coordinate_frame, type_mask, lat_int, lon_int, alt, vx, vy, vz, afx, afy, afz, yaw, yaw_rate):
                 '''
-                Set vehicle position, velocity and acceleration setpoint in the WGS84
-                coordinate system.
+                Sets a desired vehicle position, velocity, and/or acceleration in a
+                global coordinate system (WGS84). Used by an external
+                controller to command the vehicle (manual controller
+                or other system).
 
                 time_boot_ms              : Timestamp in milliseconds since system boot. The rationale for the timestamp in the setpoint is to allow the system to compensate for the transport delay of the setpoint. This allows the system to compensate processing latency. (uint32_t)
                 target_system             : System ID (uint8_t)
@@ -12058,8 +12286,10 @@ class MAVLink(object):
 
         def set_position_target_global_int_send(self, time_boot_ms, target_system, target_component, coordinate_frame, type_mask, lat_int, lon_int, alt, vx, vy, vz, afx, afy, afz, yaw, yaw_rate):
                 '''
-                Set vehicle position, velocity and acceleration setpoint in the WGS84
-                coordinate system.
+                Sets a desired vehicle position, velocity, and/or acceleration in a
+                global coordinate system (WGS84). Used by an external
+                controller to command the vehicle (manual controller
+                or other system).
 
                 time_boot_ms              : Timestamp in milliseconds since system boot. The rationale for the timestamp in the setpoint is to allow the system to compensate for the transport delay of the setpoint. This allows the system to compensate processing latency. (uint32_t)
                 target_system             : System ID (uint8_t)
@@ -12083,8 +12313,11 @@ class MAVLink(object):
 
         def position_target_global_int_encode(self, time_boot_ms, coordinate_frame, type_mask, lat_int, lon_int, alt, vx, vy, vz, afx, afy, afz, yaw, yaw_rate):
                 '''
-                Set vehicle position, velocity and acceleration setpoint in the WGS84
-                coordinate system.
+                Reports the current commanded vehicle position, velocity, and
+                acceleration as specified by the autopilot. This
+                should match the commands sent in
+                SET_POSITION_TARGET_GLOBAL_INT if the vehicle is being
+                controlled this way.
 
                 time_boot_ms              : Timestamp in milliseconds since system boot. The rationale for the timestamp in the setpoint is to allow the system to compensate for the transport delay of the setpoint. This allows the system to compensate processing latency. (uint32_t)
                 coordinate_frame          : Valid options are: MAV_FRAME_GLOBAL_INT = 5, MAV_FRAME_GLOBAL_RELATIVE_ALT_INT = 6, MAV_FRAME_GLOBAL_TERRAIN_ALT_INT = 11 (uint8_t)
@@ -12106,8 +12339,11 @@ class MAVLink(object):
 
         def position_target_global_int_send(self, time_boot_ms, coordinate_frame, type_mask, lat_int, lon_int, alt, vx, vy, vz, afx, afy, afz, yaw, yaw_rate):
                 '''
-                Set vehicle position, velocity and acceleration setpoint in the WGS84
-                coordinate system.
+                Reports the current commanded vehicle position, velocity, and
+                acceleration as specified by the autopilot. This
+                should match the commands sent in
+                SET_POSITION_TARGET_GLOBAL_INT if the vehicle is being
+                controlled this way.
 
                 time_boot_ms              : Timestamp in milliseconds since system boot. The rationale for the timestamp in the setpoint is to allow the system to compensate for the transport delay of the setpoint. This allows the system to compensate processing latency. (uint32_t)
                 coordinate_frame          : Valid options are: MAV_FRAME_GLOBAL_INT = 5, MAV_FRAME_GLOBAL_RELATIVE_ALT_INT = 6, MAV_FRAME_GLOBAL_TERRAIN_ALT_INT = 11 (uint8_t)
@@ -12565,7 +12801,7 @@ class MAVLink(object):
                 diff_pressure             : Differential pressure (airspeed) in millibar (float)
                 pressure_alt              : Altitude calculated from pressure (float)
                 temperature               : Temperature in degrees celsius (float)
-                fields_updated            : Bitmask for fields that have updated since last message, bit 0 = xacc, bit 12: temperature (uint32_t)
+                fields_updated            : Bitmask for fields that have updated since last message, bit 0 = xacc, bit 12: temperature, bit 31: full reset of attitude/position/velocities/etc was performed in sim. (uint32_t)
 
                 '''
                 return MAVLink_hil_sensor_message(time_usec, xacc, yacc, zacc, xgyro, ygyro, zgyro, xmag, ymag, zmag, abs_pressure, diff_pressure, pressure_alt, temperature, fields_updated)
@@ -12588,7 +12824,7 @@ class MAVLink(object):
                 diff_pressure             : Differential pressure (airspeed) in millibar (float)
                 pressure_alt              : Altitude calculated from pressure (float)
                 temperature               : Temperature in degrees celsius (float)
-                fields_updated            : Bitmask for fields that have updated since last message, bit 0 = xacc, bit 12: temperature (uint32_t)
+                fields_updated            : Bitmask for fields that have updated since last message, bit 0 = xacc, bit 12: temperature, bit 31: full reset of attitude/position/velocities/etc was performed in sim. (uint32_t)
 
                 '''
                 return self.send(self.hil_sensor_encode(time_usec, xacc, yacc, zacc, xgyro, ygyro, zgyro, xmag, ymag, zmag, abs_pressure, diff_pressure, pressure_alt, temperature, fields_updated))
@@ -13695,6 +13931,44 @@ class MAVLink(object):
                 '''
                 return self.send(self.scaled_pressure3_encode(time_boot_ms, press_abs, press_diff, temperature))
 
+        def follow_target_encode(self, timestamp, est_capabilities, lat, lon, alt, vel, acc, attitude_q, rates, position_cov, custom_state):
+                '''
+                current motion information from a designated system
+
+                timestamp                 : Timestamp in milliseconds since system boot (uint64_t)
+                est_capabilities          : bit positions for tracker reporting capabilities (POS = 0, VEL = 1, ACCEL = 2, ATT + RATES = 3) (uint8_t)
+                lat                       : Latitude (WGS84), in degrees * 1E7 (int32_t)
+                lon                       : Longitude (WGS84), in degrees * 1E7 (int32_t)
+                alt                       : AMSL, in meters (float)
+                vel                       : target velocity (0,0,0) for unknown (float)
+                acc                       : linear target acceleration (0,0,0) for unknown (float)
+                attitude_q                : (1 0 0 0 for unknown) (float)
+                rates                     : (0 0 0 for unknown) (float)
+                position_cov              : eph epv (float)
+                custom_state              : button states or switches of a tracker device (uint64_t)
+
+                '''
+                return MAVLink_follow_target_message(timestamp, est_capabilities, lat, lon, alt, vel, acc, attitude_q, rates, position_cov, custom_state)
+
+        def follow_target_send(self, timestamp, est_capabilities, lat, lon, alt, vel, acc, attitude_q, rates, position_cov, custom_state):
+                '''
+                current motion information from a designated system
+
+                timestamp                 : Timestamp in milliseconds since system boot (uint64_t)
+                est_capabilities          : bit positions for tracker reporting capabilities (POS = 0, VEL = 1, ACCEL = 2, ATT + RATES = 3) (uint8_t)
+                lat                       : Latitude (WGS84), in degrees * 1E7 (int32_t)
+                lon                       : Longitude (WGS84), in degrees * 1E7 (int32_t)
+                alt                       : AMSL, in meters (float)
+                vel                       : target velocity (0,0,0) for unknown (float)
+                acc                       : linear target acceleration (0,0,0) for unknown (float)
+                attitude_q                : (1 0 0 0 for unknown) (float)
+                rates                     : (0 0 0 for unknown) (float)
+                position_cov              : eph epv (float)
+                custom_state              : button states or switches of a tracker device (uint64_t)
+
+                '''
+                return self.send(self.follow_target_encode(timestamp, est_capabilities, lat, lon, alt, vel, acc, attitude_q, rates, position_cov, custom_state))
+
         def control_system_state_encode(self, time_usec, x_acc, y_acc, z_acc, x_vel, y_vel, z_vel, x_pos, y_pos, z_pos, airspeed, vel_variance, pos_variance, q, roll_rate, pitch_rate, yaw_rate):
                 '''
                 The smoothed, monotonic system state used to feed the control loops of
@@ -13755,7 +14029,7 @@ class MAVLink(object):
                 battery_function          : Function of the battery (uint8_t)
                 type                      : Type (chemistry) of the battery (uint8_t)
                 temperature               : Temperature of the battery in centi-degrees celsius. INT16_MAX for unknown temperature. (int16_t)
-                voltages                  : Battery voltage of cells, in millivolts (1 = 1 millivolt) (uint16_t)
+                voltages                  : Battery voltage of cells, in millivolts (1 = 1 millivolt). Cells above the valid cell count for this battery should have the UINT16_MAX value. (uint16_t)
                 current_battery           : Battery current, in 10*milliamperes (1 = 10 milliampere), -1: autopilot does not measure the current (int16_t)
                 current_consumed          : Consumed charge, in milliampere hours (1 = 1 mAh), -1: autopilot does not provide mAh consumption estimate (int32_t)
                 energy_consumed           : Consumed energy, in 100*Joules (intergrated U*I*dt)  (1 = 100 Joule), -1: autopilot does not provide energy consumption estimate (int32_t)
@@ -13772,7 +14046,7 @@ class MAVLink(object):
                 battery_function          : Function of the battery (uint8_t)
                 type                      : Type (chemistry) of the battery (uint8_t)
                 temperature               : Temperature of the battery in centi-degrees celsius. INT16_MAX for unknown temperature. (int16_t)
-                voltages                  : Battery voltage of cells, in millivolts (1 = 1 millivolt) (uint16_t)
+                voltages                  : Battery voltage of cells, in millivolts (1 = 1 millivolt). Cells above the valid cell count for this battery should have the UINT16_MAX value. (uint16_t)
                 current_battery           : Battery current, in 10*milliamperes (1 = 10 milliampere), -1: autopilot does not measure the current (int16_t)
                 current_consumed          : Consumed charge, in milliampere hours (1 = 1 mAh), -1: autopilot does not provide mAh consumption estimate (int32_t)
                 energy_consumed           : Consumed energy, in 100*Joules (intergrated U*I*dt)  (1 = 100 Joule), -1: autopilot does not provide energy consumption estimate (int32_t)
@@ -14054,7 +14328,7 @@ class MAVLink(object):
                 altitude                  : Altitude(ASL) in millimeters (int32_t)
                 heading                   : Course over ground in centidegrees (uint16_t)
                 hor_velocity              : The horizontal velocity in centimeters/second (uint16_t)
-                ver_velocity              : The vertical velocity in centimeters/second, positive is up (uint16_t)
+                ver_velocity              : The vertical velocity in centimeters/second, positive is up (int16_t)
                 callsign                  : The callsign, 8+null (char)
                 emitter_type              : Type from ADSB_EMITTER_TYPE enum (uint8_t)
                 tslc                      : Time since last communication in seconds (uint8_t)
@@ -14075,7 +14349,7 @@ class MAVLink(object):
                 altitude                  : Altitude(ASL) in millimeters (int32_t)
                 heading                   : Course over ground in centidegrees (uint16_t)
                 hor_velocity              : The horizontal velocity in centimeters/second (uint16_t)
-                ver_velocity              : The vertical velocity in centimeters/second, positive is up (uint16_t)
+                ver_velocity              : The vertical velocity in centimeters/second, positive is up (int16_t)
                 callsign                  : The callsign, 8+null (char)
                 emitter_type              : Type from ADSB_EMITTER_TYPE enum (uint8_t)
                 tslc                      : Time since last communication in seconds (uint8_t)
