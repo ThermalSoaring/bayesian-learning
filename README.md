@@ -3,9 +3,6 @@
 ## Connecting with simulator
 Processing using the live data from a simulator
 
-#### integrated
-Run GPR and Bayesian parameter estimation connected with the Piccolo simulator
-
 #### simulation
 Connect with FlightGear and crrcsim
 
